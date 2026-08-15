@@ -1,4 +1,4 @@
-let userId=null,chapterId=null,currentPattern=null,currentStrand=null;
+let userId=null,chapterId=null,currentPattern=null,currentStrand=null,compassStrandId=null,lastBlindSpot=null;
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 
 async function api(path,opts={}){
@@ -59,7 +59,7 @@ async function refreshDNA(){
   $('#revealEmpty').classList.toggle('hidden',visible.length>0);
   $('#patterns').innerHTML=visible.map(s=>{
     const label=s.user_label||s.ai_label||'Unnamed clue';
-    const ownership=s.status==='user_defined'?'Defined by you':'AI hypothesis';
+    const ownership=s.status==='user_defined'?'Defined by you':s.status==='questioned'?'AI hypothesis · challenged':'AI hypothesis';
     return `<button class="dna-chip ${s.status==='user_defined'?'human':'ai'}" data-pattern="${s.pattern_id||''}" data-strand="${s.id}" data-label="${escapeHtml(label)}"><span>${s.status==='user_defined'?'●':'◌'}</span><b>${escapeHtml(label)}</b><small>${ownership}</small></button>`;
   }).join('');
   $$('.dna-chip').forEach(chip=>chip.onclick=()=>openReveal(chip.dataset.pattern,chip.dataset.strand,chip.dataset.label));
@@ -79,6 +79,11 @@ async function openReveal(patternId,strandId,label,scroll=true){
   $('#revealPanel').classList.toggle('human-defined',human);
   $('#contestResult').classList.add('hidden');$('#contestResult').innerHTML='';
   $('#renameInput').value=human?(strand.user_label||''):'';
+  resetBlindSpot();
+  $('#blindSpotPanel').classList.remove('hidden');
+  $('#blindQuestion').textContent='A useful reflection may live in the difference between what AI noticed and what you mean.';
+  $('#blindBridge').textContent='Challenge this clue or define it in your own words, then open the Blind Spot.';
+  $('#blindBoundary').textContent='The AI can surface a tension. It cannot decide what that tension means.';
   if(scroll)$('#revealPanel').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
@@ -98,6 +103,7 @@ $('#challengeBtn').onclick=async()=>{
   box.innerHTML=`<div class="contest-heading"><strong>The AI tried to prove itself wrong.</strong><span>${d.status.replace('_',' ')}</span></div>${d.contradicting.length?d.contradicting.map(x=>`<div class="evidence-line counter"><span>↔</span><div><b>${escapeHtml(x.summary)}</b><p>${escapeHtml(x.original||'')}</p><small>semantic similarity ${x.similarity}</small></div></div>`).join(''):'<div class="no-counter"><b>No meaningful counter-evidence surfaced yet.</b><p>That does not make the hypothesis true. It only means the current story is incomplete.</p></div>'}<p class="trust-note">${escapeHtml(d.message||'')}</p>`;
   $('#revealStatus').textContent=d.status.replace('_',' ');
   await refreshDNA();
+  await loadBlindSpot(false);
 };
 
 $('#notMeBtn').onclick=async()=>{
@@ -108,6 +114,7 @@ $('#notMeBtn').onclick=async()=>{
   $('#contestResult').classList.remove('hidden');
   $('#contestResult').innerHTML=`<div class="rejected-state"><b>Not you. Understood.</b><p>${escapeHtml(d.message)}</p></div>`;
   say('AI hypothesis rejected');
+  compassStrandId=null;lastBlindSpot=null;
   currentPattern=null;currentStrand=null;
   setTimeout(async()=>{$('#revealPanel').classList.add('hidden');await refreshDNA()},600);
 };
@@ -124,17 +131,68 @@ $('#renameBtn').onclick=async()=>{
   $('#contestResult').innerHTML=`<div class="human-win"><span>●</span><div><b>${escapeHtml(d.user_label)}</b><p>The AI's label did not become your identity. Your interpretation did.</p></div></div>`;
   say('DNA · defined by you');
   await refreshDNA();
+  await loadBlindSpot(false);
+};
+
+function resetBlindSpot(){
+  lastBlindSpot=null;
+  $('#blindOwnership').innerHTML='';
+  $('#toCompassBtn').classList.add('hidden');
+  $('#openBlindSpotBtn').classList.remove('hidden');
+}
+
+$('#openBlindSpotBtn').onclick=()=>loadBlindSpot(true);
+async function loadBlindSpot(scroll=true){
+  if(!currentStrand)return;
+  try{
+    const d=await api(`/api/v1/dna/${userId}/strands/${currentStrand}/blind-spot`);
+    lastBlindSpot=d;
+    const owner=d.ownership_state;
+    const ownerMarkup=owner==='user_defined'
+      ? `<div class="owner-node ai-node"><span>AI NOTICED</span><b>${escapeHtml(d.ai_label)}</b></div><div class="owner-arrow">→</div><div class="owner-node human-node"><span>YOU DEFINED</span><b>${escapeHtml(d.user_label)}</b></div>`
+      : `<div class="owner-node ai-node"><span>${owner==='ai_challenged'?'AI HYPOTHESIS · CHALLENGED':'AI HYPOTHESIS'}</span><b>${escapeHtml(d.ai_label)}</b></div>`;
+    $('#blindOwnership').innerHTML=ownerMarkup;
+    $('#blindQuestion').textContent=d.question;
+    $('#blindBridge').textContent=d.bridge_text;
+    $('#blindBoundary').textContent=d.boundary;
+    $('#openBlindSpotBtn').classList.add('hidden');
+    $('#toCompassBtn').classList.toggle('hidden',!d.can_enter_compass);
+    $('#blindSpotPanel').classList.remove('hidden');
+    if(scroll)$('#blindSpotPanel').scrollIntoView({behavior:'smooth',block:'center'});
+    say(d.can_enter_compass?'Blind Spot · your words are ready for Compass':'Blind Spot · define this in your words before Compass');
+  }catch(err){alert(err.message)}
+}
+
+$('#toCompassBtn').onclick=()=>{
+  if(!lastBlindSpot?.can_enter_compass||!currentStrand)return;
+  compassStrandId=currentStrand;
+  $('#handoffAI').textContent=lastBlindSpot.ai_label||'AI hypothesis';
+  $('#handoffUser').textContent=lastBlindSpot.user_label||'Your words';
+  $('#compassHandoff').classList.remove('hidden');
+  setView('compass');
+  window.scrollTo({top:0,behavior:'smooth'});
+  say('Compass · carrying your interpretation forward');
 };
 
 $('#makeChapter').onclick=async()=>{
   if(!needUser())return;
-  const c=await api(`/api/v1/compass/${userId}/chapters`,{method:'POST',body:JSON.stringify({title:$('#chapter').value||'My current chapter'})});
+  const c=await api(`/api/v1/compass/${userId}/chapters`,{method:'POST',body:JSON.stringify({title:$('#chapter').value||'My current chapter',description:$('#chapterDescription').value||null})});
   chapterId=c.id;say('Compass · '+c.title);
 };
 $('#reflect').onclick=async()=>{
   if(!chapterId){alert('Create your current chapter first.');return}
-  const r=await api(`/api/v1/compass/${userId}/reflect`,{method:'POST',body:JSON.stringify({chapter_id:chapterId,focus:{}})});
+  const r=await api(`/api/v1/compass/${userId}/reflect`,{method:'POST',body:JSON.stringify({chapter_id:chapterId,strand_id:compassStrandId,focus:{}})});
   $('#compassResult').innerHTML=`<div class="compass-question">${escapeHtml(r.text)}</div><p class="tiny">${escapeHtml(r.note||'')}</p>`;
+  if(r.type==='question'){
+    $('#compassReflection').classList.remove('hidden');
+    $('#compassAIOriginal').textContent=r.ai_original_label||'AI hypothesis';
+    $('#compassUserDefined').textContent=r.user_defined_label||r.strand;
+    $('#compassQuestion').textContent=r.text;
+    $('#compassBoundary').textContent=r.boundary||r.note||'';
+    say('Compass · one question, then silence');
+  }else{
+    $('#compassReflection').classList.add('hidden');
+  }
 };
 
 $('#refreshVault').onclick=refreshVault;
