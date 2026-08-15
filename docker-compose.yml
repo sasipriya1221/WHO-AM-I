@@ -2,7 +2,7 @@ services:
   who-am-i:
     build: .
     ports:
-      - "8000:8000"
+      - "8080:8080"
     volumes:
       - who_am_i_data:/app/backend/data
 
