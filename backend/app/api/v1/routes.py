@@ -26,6 +26,13 @@ def pattern_or_404(db: Session, user_id: str, pattern_id: str) -> Pattern:
     return pattern
 
 
+def strand_or_404(db: Session, user_id: str, strand_id: str) -> DNAStrand:
+    strand = db.get(DNAStrand, strand_id)
+    if not strand or strand.user_id != user_id:
+        raise HTTPException(404, "DNA strand not found")
+    return strand
+
+
 @router.post("/users/demo")
 def create_demo(payload: DemoUserCreate, db: Session = Depends(get_db)):
     existing = db.scalar(select(User).where(User.email == payload.email))
@@ -179,9 +186,7 @@ def strands(user_id: str, db: Session = Depends(get_db)):
 
 
 def _rename_strand(db: Session, user_id: str, strand_id: str, payload: StrandRename):
-    strand = db.get(DNAStrand, strand_id)
-    if not strand or strand.user_id != user_id:
-        raise HTTPException(404, "Strand not found")
+    strand = strand_or_404(db, user_id, strand_id)
     strand.user_label = payload.user_label
     strand.status = StrandStatus.USER_DEFINED
     db.commit()
@@ -196,6 +201,73 @@ def rename_strand_legacy(user_id: str, strand_id: str, payload: StrandRename, db
 @router.post("/dna/{user_id}/strands/{strand_id}/rename")
 def rename_strand(user_id: str, strand_id: str, payload: StrandRename, db: Session = Depends(get_db)):
     return _rename_strand(db, user_id, strand_id, payload)
+
+
+@router.get("/dna/{user_id}/strands/{strand_id}/blind-spot")
+def blind_spot(user_id: str, strand_id: str, db: Session = Depends(get_db)):
+    strand = strand_or_404(db, user_id, strand_id)
+    pattern = db.get(Pattern, strand.pattern_id) if strand.pattern_id else None
+    ai_label = strand.ai_original_label or (pattern.ai_label if pattern else "this pattern")
+    pattern_status = pattern.status.value if pattern else "unknown"
+    support_count = pattern.support_count if pattern else 0
+    contradiction_count = pattern.contradiction_count if pattern else 0
+
+    if strand.status == StrandStatus.RETIRED or pattern_status == PatternStatus.REJECTED.value:
+        raise HTTPException(409, "Rejected strands do not become Blind Spot or Compass material.")
+
+    if strand.status == StrandStatus.USER_DEFINED:
+        user_label = strand.user_label or ai_label
+        question = (
+            f"The AI first called this ‘{ai_label}’. You defined it as ‘{user_label}’. "
+            "What does your wording capture that the AI's label missed?"
+        )
+        if pattern_status == PatternStatus.QUESTIONED.value:
+            question = (
+                f"The AI first called this ‘{ai_label}’, and conflicting clues challenged that label. "
+                f"You chose ‘{user_label}’. What changes when you use your words instead of the AI's?"
+            )
+        return {
+            "stage": "blind_spot",
+            "ownership_state": "user_defined",
+            "ai_label": ai_label,
+            "user_label": user_label,
+            "pattern_status": pattern_status,
+            "support_count": support_count,
+            "contradiction_count": contradiction_count,
+            "question": question,
+            "bridge_text": "Carry your interpretation—not the AI's label—into Compass.",
+            "can_enter_compass": True,
+            "boundary": "Blind Spot reflects a tension. It does not decide what the tension means.",
+        }
+
+    if strand.status == StrandStatus.QUESTIONED or pattern_status == PatternStatus.QUESTIONED.value:
+        return {
+            "stage": "blind_spot",
+            "ownership_state": "ai_challenged",
+            "ai_label": ai_label,
+            "user_label": None,
+            "pattern_status": pattern_status,
+            "support_count": support_count,
+            "contradiction_count": contradiction_count,
+            "question": f"‘{ai_label}’ was challenged by conflicting clues. In which situations does it fit, and in which situations does it not?",
+            "bridge_text": "Before Compass uses this, define the part that feels true in your own words.",
+            "can_enter_compass": False,
+            "boundary": "The AI can surface the contradiction. Only you can interpret it.",
+        }
+
+    return {
+        "stage": "blind_spot",
+        "ownership_state": "ai_hypothesis",
+        "ai_label": ai_label,
+        "user_label": None,
+        "pattern_status": pattern_status,
+        "support_count": support_count,
+        "contradiction_count": contradiction_count,
+        "question": f"The AI noticed ‘{ai_label}’. Before carrying it forward, what part of that label feels incomplete or too simple?",
+        "bridge_text": "Challenge or define this clue before Compass uses it.",
+        "can_enter_compass": False,
+        "boundary": "An AI hypothesis is not a user identity.",
+    }
 
 
 @router.post("/compass/{user_id}/chapters")
@@ -214,11 +286,37 @@ def compass_reflect(user_id: str, payload: CompassReflect, db: Session = Depends
     chapter = db.get(LifeChapter, payload.chapter_id)
     if not chapter or chapter.user_id != user_id:
         raise HTTPException(404, "Chapter not found")
-    eligible = db.scalars(select(DNAStrand).where(DNAStrand.user_id == user_id, DNAStrand.status == StrandStatus.USER_DEFINED)).all()
-    if not eligible:
-        return {"type": "fog", "text": "Some parts of this road are still unclear. Define at least one DNA strand in your own words before Compass uses it."}
-    label = eligible[0].user_label or eligible[0].ai_original_label
-    return {"type": "question", "strand": label, "text": f"You defined ‘{label}’ as meaningful. Does the road you're describing leave room for it — and is that trade-off intentional?", "note": "Compass notices and questions. It never recommends a decision."}
+
+    strand = None
+    if payload.strand_id:
+        candidate = strand_or_404(db, user_id, payload.strand_id)
+        if candidate.status != StrandStatus.USER_DEFINED:
+            raise HTTPException(409, "Compass only uses strands defined by the user.")
+        strand = candidate
+    else:
+        strand = db.scalar(select(DNAStrand).where(DNAStrand.user_id == user_id, DNAStrand.status == StrandStatus.USER_DEFINED))
+
+    if not strand:
+        return {
+            "type": "fog",
+            "text": "Some parts of this road are still unclear. Define at least one DNA strand in your own words before Compass uses it.",
+            "ownership_state": "none",
+            "note": "Compass refuses to use an unconfirmed AI hypothesis.",
+        }
+
+    label = strand.user_label or strand.ai_original_label
+    return {
+        "type": "question",
+        "strand_id": strand.id,
+        "strand": label,
+        "ownership_state": "user_defined",
+        "ai_original_label": strand.ai_original_label,
+        "user_defined_label": label,
+        "chapter": chapter.title,
+        "text": f"You defined ‘{label}’ as meaningful. In this chapter—‘{chapter.title}’—where does your current road make room for it, and where does it not? Is that trade-off intentional?",
+        "note": "Compass notices, compares, questions, and remembers. It never recommends a decision.",
+        "boundary": "AI notices the road. You keep the steering wheel.",
+    }
 
 
 @router.get("/vault/{user_id}")
