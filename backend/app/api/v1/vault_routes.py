@@ -6,7 +6,8 @@ from app.database import get_db
 from app.models.entities import DNAStrand, Evidence, MirrorInterest, Pattern, PatternEvidence
 from app.services.dna.engine import recompute_patterns
 
-vault_router = APIRouter(prefix="/api/v1")
+# This router is included inside the existing /api/v1 router.
+vault_router = APIRouter()
 
 
 def _strand_for_pattern(db: Session, user_id: str, pattern_id: str):
