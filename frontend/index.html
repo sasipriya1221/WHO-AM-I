@@ -6,6 +6,7 @@
   <title>WHO AM I?</title>
   <link rel="stylesheet" href="/static/styles.css">
   <link rel="stylesheet" href="/static/vault.css">
+  <link rel="stylesheet" href="/static/demo.css">
 </head>
 <body>
 <div class="shell">
@@ -19,6 +20,7 @@
   </header>
 
   <nav>
+    <button data-view="demo">✨ Judge Demo</button>
     <button data-view="mirror" class="active">🪞 Mirror</button>
     <button data-view="dna">🧬 Happiness DNA</button>
     <button data-view="compass">🧭 Compass</button>
@@ -26,6 +28,96 @@
   </nav>
 
   <main>
+    <section id="demo" class="view">
+      <div class="demo-hero">
+        <div class="demo-title-row">
+          <div>
+            <span class="eyebrow">3-MINUTE GOLDEN PATH</span>
+            <h2>Watch the AI lose authority — on purpose.</h2>
+            <p>This seeded journey proves the whole product philosophy with one user: evidence creates a hypothesis, the AI challenges itself, the human defines the meaning, Compass reflects without advising, and deleted evidence loses influence.</p>
+          </div>
+          <div class="demo-badge">JUDGE MODE · deterministic seed</div>
+        </div>
+        <div class="demo-principle"><b>Core proof:</b> AI can notice a clue. It cannot own the conclusion, and it cannot keep using evidence the user deletes.</div>
+        <div class="demo-controls"><button id="startJudgeDemo">Reset & seed Maya</button><span id="demoStartState" class="tiny hidden">Fresh demo user ready.</span></div>
+      </div>
+
+      <div class="demo-timeline">
+        <div class="demo-dot active">1 · Experience</div><div class="demo-dot">2 · DNA</div><div class="demo-dot">3 · Challenge</div><div class="demo-dot">4 · Rename</div><div class="demo-dot">5 · Compass</div><div class="demo-dot">6 · Delete</div><div class="demo-dot">7 · Weakens</div>
+      </div>
+
+      <div class="demo-stage">
+        <article class="demo-card visible">
+          <span class="demo-step-kicker">STEP 1 · EXPERIENCE</span>
+          <h3>Meet <span id="demoMaya">Maya</span>.</h3>
+          <p>Three separate self-discovery experiences leave related clues. They are intentionally independent.</p>
+          <div id="demoExperiences" class="demo-experiences"><div class="demo-exp"><span>START</span><b>Seed the demo first</b></div></div>
+          <div id="demoEntertainment" class="tiny"></div>
+          <button id="demoRevealBtn">Reveal the DNA clue →</button>
+        </article>
+
+        <article class="demo-card">
+          <span class="demo-step-kicker">STEP 2 · HAPPINESS DNA</span>
+          <h3>Different experiences. Similar clue.</h3>
+          <div id="demoDnaOwnership"></div>
+          <div id="demoDnaState" class="status-chip"></div>
+          <div id="demoWhyEvidence"></div>
+          <p class="trust-note">The label is still an AI hypothesis, not Maya’s identity.</p>
+          <button id="demoChallengeBtn">Challenge the AI →</button>
+        </article>
+
+        <article class="demo-card">
+          <span class="demo-step-kicker">STEP 3 · CHALLENGE</span>
+          <h3>The AI tries to prove itself wrong.</h3>
+          <p>Counter-evidence is retrieved before the label is allowed to feel authoritative.</p>
+          <div id="demoCounters"></div>
+          <p>Pattern state: <b id="demoChallengeState">questioned</b></p>
+          <button id="demoRenameBtn">Maya defines what it really means →</button>
+        </article>
+
+        <article class="demo-card">
+          <span class="demo-step-kicker">STEP 4 · HUMAN RENAME</span>
+          <h3>The AI’s words do not become Maya’s identity.</h3>
+          <div id="demoRenameOwnership"></div>
+          <p id="demoRenameMessage"></p>
+          <button id="demoCompassBtn">Carry Maya’s words into Compass →</button>
+        </article>
+
+        <article class="demo-card">
+          <span class="demo-step-kicker">STEP 5 · COMPASS</span>
+          <h3>See the road. Keep the steering wheel.</h3>
+          <div id="demoCompassOwnership"></div>
+          <blockquote id="demoCompassQuestion" class="demo-question"></blockquote>
+          <p id="demoCompassBoundary" class="trust-note"></p>
+          <p class="tiny">No recommendation follows. Maya decides.</p>
+          <button id="demoDeletePreviewBtn">Now inspect one supporting reflection →</button>
+        </article>
+
+        <article class="demo-card">
+          <span class="demo-step-kicker">STEP 6 · VAULT</span>
+          <h3>Deletion is not cosmetic.</h3>
+          <p>The Vault shows exactly which inference a reflection currently influences before Maya removes it.</p>
+          <div id="demoDeleteEvidence" class="demo-counter"></div>
+          <div id="demoDeleteImpact"></div>
+          <button id="demoDeleteBtn" class="danger-outline">Delete reflection & recalculate DNA →</button>
+        </article>
+
+        <article class="demo-card demo-finale">
+          <span class="demo-step-kicker">STEP 7 · DNA WEAKENS</span>
+          <h3>The story changed, so the AI must change too.</h3>
+          <div id="demoWeakenOwnership"></div>
+          <div class="demo-change">
+            <div class="demo-state"><span>BEFORE</span><strong id="demoBeforeStatus">—</strong><b id="demoBeforeSupport">—</b></div>
+            <div class="demo-arrow">→</div>
+            <div class="demo-state after"><span>AFTER</span><strong id="demoAfterStatus">—</strong><b id="demoAfterSupport">—</b></div>
+          </div>
+          <p id="demoWeakenMessage"></p>
+          <p id="demoOwnershipPreserved"><strong>Your definition stayed yours; only the AI evidence state changed.</strong></p>
+          <div class="demo-principle">The AI was allowed to be wrong, Maya was allowed to redefine it, and deleted evidence lost its influence. <strong>That is WHO AM I?</strong></div>
+        </article>
+      </div>
+    </section>
+
     <section id="mirror" class="view active">
       <div class="hero">
         <span>THE SURFACE</span>
@@ -60,159 +152,31 @@
         <h2>Explore, don't get diagnosed.</h2>
         <p>Happiness DNA is a metaphor for patterns you choose to explore. It is not a score, test, diagnosis, or fixed identity.</p>
       </div>
-
-      <div class="dna-disclaimer">
-        <strong>AI hypotheses are dotted. Your definitions are solid.</strong>
-        <span>The system can be wrong. You can ask why, challenge it, reject it, or rename it.</span>
-      </div>
-
+      <div class="dna-disclaimer"><strong>AI hypotheses are dotted. Your definitions are solid.</strong><span>The system can be wrong. You can ask why, challenge it, reject it, or rename it.</span></div>
       <div class="grid">
-        <div class="card">
-          <h3>Enter DNA</h3>
-          <p>Only experiences you explicitly consent to share here are analysed.</p>
-          <button id="consent">I choose to explore</button>
-        </div>
-        <div class="card">
-          <h3>Empty Room</h3>
-          <textarea id="room" placeholder="Family is close. Career matters. I want control over my choices..."></textarea>
-          <button data-exp="empty_room" class="submitExp">Add this clue</button>
-        </div>
-        <div class="card">
-          <h3>Future Me</h3>
-          <textarea id="future" placeholder="I don't want to feel trapped doing something I never chose..."></textarea>
-          <button data-exp="future_me" class="submitExp">Add this clue</button>
-        </div>
+        <div class="card"><h3>Enter DNA</h3><p>Only experiences you explicitly consent to share here are analysed.</p><button id="consent">I choose to explore</button></div>
+        <div class="card"><h3>Empty Room</h3><textarea id="room" placeholder="Family is close. Career matters. I want control over my choices..."></textarea><button data-exp="empty_room" class="submitExp">Add this clue</button></div>
+        <div class="card"><h3>Future Me</h3><textarea id="future" placeholder="I don't want to feel trapped doing something I never chose..."></textarea><button data-exp="future_me" class="submitExp">Add this clue</button></div>
       </div>
-
-      <div class="card wide dna-stage">
-        <div class="dna-stage-header">
-          <div>
-            <span class="eyebrow">YOUR EVOLVING DNA</span>
-            <h3>Different experiences. Similar clues.</h3>
-          </div>
-          <button id="refreshDNA" class="ghost">Refresh clues</button>
-        </div>
-        <div id="patterns" class="patterns"></div>
-        <div id="revealEmpty" class="empty-reveal">
-          <div class="helix-mark">🧬</div>
-          <p>Not enough independent clues yet.</p>
-          <span>That is a valid result. WHO AM I? would rather say “I don't know yet” than invent certainty.</span>
-        </div>
-      </div>
-
+      <div class="card wide dna-stage"><div class="dna-stage-header"><div><span class="eyebrow">YOUR EVOLVING DNA</span><h3>Different experiences. Similar clues.</h3></div><button id="refreshDNA" class="ghost">Refresh clues</button></div><div id="patterns" class="patterns"></div><div id="revealEmpty" class="empty-reveal"><div class="helix-mark">🧬</div><p>Not enough independent clues yet.</p><span>That is a valid result. WHO AM I? would rather say “I don't know yet” than invent certainty.</span></div></div>
       <div id="revealPanel" class="reveal-panel hidden" aria-live="polite">
-        <div class="reveal-topline">
-          <span class="eyebrow">POSSIBLE PATTERN</span>
-          <span id="revealStatus" class="status-chip">emerging</span>
-        </div>
-        <div class="strand-orbit">
-          <div class="strand-glow"></div>
-          <div class="strand-icon">🧬</div>
-        </div>
-        <p class="reveal-copy">Different experiences left a similar clue.</p>
-        <h2 id="revealLabel">Autonomy</h2>
-        <p id="ownershipLine" class="ownership-line">AI noticed this. You decide what it means.</p>
-
-        <div class="contest-actions">
-          <button id="whyBtn">Why?</button>
-          <button id="challengeBtn" class="secondary">Challenge it</button>
-          <button id="notMeBtn" class="danger-outline">Not me</button>
-        </div>
-
-        <div id="contestResult" class="contest-result hidden"></div>
-
-        <div class="rename-box">
-          <label for="renameInput">The AI's words do not have to become yours.</label>
-          <div class="rename-row">
-            <input id="renameInput" placeholder="What would YOU call this?">
-            <button id="renameBtn">Define in my words</button>
-          </div>
-        </div>
-
-        <div id="blindSpotPanel" class="blind-spot hidden" aria-live="polite">
-          <div class="blind-spot-kicker">BLIND SPOT</div>
-          <h3>The interesting part may be the gap.</h3>
-          <div id="blindOwnership" class="ownership-trail"></div>
-          <blockquote id="blindQuestion"></blockquote>
-          <p id="blindBridge" class="blind-bridge"></p>
-          <div class="blind-actions">
-            <button id="openBlindSpotBtn" class="secondary">Open Blind Spot</button>
-            <button id="toCompassBtn" class="hidden">Carry my words into Compass →</button>
-          </div>
-          <p id="blindBoundary" class="trust-note"></p>
-        </div>
+        <div class="reveal-topline"><span class="eyebrow">POSSIBLE PATTERN</span><span id="revealStatus" class="status-chip">emerging</span></div><div class="strand-orbit"><div class="strand-glow"></div><div class="strand-icon">🧬</div></div><p class="reveal-copy">Different experiences left a similar clue.</p><h2 id="revealLabel">Autonomy</h2><p id="ownershipLine" class="ownership-line">AI noticed this. You decide what it means.</p>
+        <div class="contest-actions"><button id="whyBtn">Why?</button><button id="challengeBtn" class="secondary">Challenge it</button><button id="notMeBtn" class="danger-outline">Not me</button></div><div id="contestResult" class="contest-result hidden"></div>
+        <div class="rename-box"><label for="renameInput">The AI's words do not have to become yours.</label><div class="rename-row"><input id="renameInput" placeholder="What would YOU call this?"><button id="renameBtn">Define in my words</button></div></div>
+        <div id="blindSpotPanel" class="blind-spot hidden" aria-live="polite"><div class="blind-spot-kicker">BLIND SPOT</div><h3>The interesting part may be the gap.</h3><div id="blindOwnership" class="ownership-trail"></div><blockquote id="blindQuestion"></blockquote><p id="blindBridge" class="blind-bridge"></p><div class="blind-actions"><button id="openBlindSpotBtn" class="secondary">Open Blind Spot</button><button id="toCompassBtn" class="hidden">Carry my words into Compass →</button></div><p id="blindBoundary" class="trust-note"></p></div>
       </div>
     </section>
 
     <section id="compass" class="view">
-      <div class="hero">
-        <span>THE HORIZON</span>
-        <h2>See the road. Keep the steering wheel.</h2>
-        <p>Compass may notice, compare, question and remember. It never recommends a life decision.</p>
-      </div>
-
-      <div id="compassHandoff" class="handoff-card hidden">
-        <div class="handoff-line"></div>
-        <div class="handoff-step">
-          <span>AI NOTICED</span>
-          <strong id="handoffAI">—</strong>
-        </div>
-        <div class="handoff-arrow">→</div>
-        <div class="handoff-step human-step">
-          <span>YOU DEFINED</span>
-          <strong id="handoffUser">—</strong>
-        </div>
-        <div class="handoff-arrow">→</div>
-        <div class="handoff-step">
-          <span>NOW ASK</span>
-          <strong>Does my road make room for this?</strong>
-        </div>
-      </div>
-
-      <div class="grid two">
-        <div class="card road-card">
-          <span class="eyebrow">THE ROAD I'M ON</span>
-          <h3>My current chapter</h3>
-          <input id="chapter" placeholder="Placement">
-          <textarea id="chapterDescription" placeholder="What is taking most of my attention right now?"></textarea>
-          <button id="makeChapter">Create road</button>
-        </div>
-        <div class="card accent compass-card">
-          <span class="eyebrow">COMPASS DOES NOT DECIDE</span>
-          <h3>One question, then silence.</h3>
-          <div id="compassResult">Define a DNA strand in your own words first.</div>
-          <button id="reflect">Look at my road</button>
-        </div>
-      </div>
-
-      <div id="compassReflection" class="compass-reflection hidden">
-        <div class="compass-ownership">
-          <span>AI originally noticed</span>
-          <strong id="compassAIOriginal">—</strong>
-          <span>You defined</span>
-          <strong id="compassUserDefined">—</strong>
-        </div>
-        <div class="road-line"><span></span></div>
-        <div class="compass-silence">
-          <span class="eyebrow">YOUR QUESTION</span>
-          <blockquote id="compassQuestion"></blockquote>
-          <p id="compassBoundary"></p>
-          <div class="silence-mark">…</div>
-          <small>No recommendation follows. The next move is yours.</small>
-        </div>
-      </div>
+      <div class="hero"><span>THE HORIZON</span><h2>See the road. Keep the steering wheel.</h2><p>Compass may notice, compare, question and remember. It never recommends a life decision.</p></div>
+      <div id="compassHandoff" class="handoff-card hidden"><div class="handoff-line"></div><div class="handoff-step"><span>AI NOTICED</span><strong id="handoffAI">—</strong></div><div class="handoff-arrow">→</div><div class="handoff-step human-step"><span>YOU DEFINED</span><strong id="handoffUser">—</strong></div><div class="handoff-arrow">→</div><div class="handoff-step"><span>NOW ASK</span><strong>Does my road make room for this?</strong></div></div>
+      <div class="grid two"><div class="card road-card"><span class="eyebrow">THE ROAD I'M ON</span><h3>My current chapter</h3><input id="chapter" placeholder="Placement"><textarea id="chapterDescription" placeholder="What is taking most of my attention right now?"></textarea><button id="makeChapter">Create road</button></div><div class="card accent compass-card"><span class="eyebrow">COMPASS DOES NOT DECIDE</span><h3>One question, then silence.</h3><div id="compassResult">Define a DNA strand in your own words first.</div><button id="reflect">Look at my road</button></div></div>
+      <div id="compassReflection" class="compass-reflection hidden"><div class="compass-ownership"><span>AI originally noticed</span><strong id="compassAIOriginal">—</strong><span>You defined</span><strong id="compassUserDefined">—</strong></div><div class="road-line"><span></span></div><div class="compass-silence"><span class="eyebrow">YOUR QUESTION</span><blockquote id="compassQuestion"></blockquote><p id="compassBoundary"></p><div class="silence-mark">…</div><small>No recommendation follows. The next move is yours.</small></div></div>
     </section>
 
     <section id="vault" class="view">
-      <div class="hero">
-        <span>YOUR DATA</span>
-        <h2>If you remove part of your story, AI loses the right to use it.</h2>
-        <p>See exactly which reflections support a pattern, then remove one and watch the evidence state recalculate.</p>
-      </div>
-      <div class="card wide">
-        <button id="refreshVault">Refresh Vault</button>
-        <div id="vaultData"></div>
-      </div>
+      <div class="hero"><span>YOUR DATA</span><h2>If you remove part of your story, AI loses the right to use it.</h2><p>See exactly which reflections support a pattern, then remove one and watch the evidence state recalculate.</p></div>
+      <div class="card wide"><button id="refreshVault">Refresh Vault</button><div id="vaultData"></div></div>
     </section>
   </main>
 
@@ -220,5 +184,6 @@
 </div>
 <script src="/static/app.js"></script>
 <script src="/static/vault.js"></script>
+<script src="/static/demo.js"></script>
 </body>
 </html>
