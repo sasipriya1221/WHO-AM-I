@@ -1,0 +1,10 @@
+services:
+  who-am-i:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - who_am_i_data:/app/backend/data
+
+volumes:
+  who_am_i_data:
