@@ -127,6 +127,19 @@
             <button id="renameBtn">Define in my words</button>
           </div>
         </div>
+
+        <div id="blindSpotPanel" class="blind-spot hidden" aria-live="polite">
+          <div class="blind-spot-kicker">BLIND SPOT</div>
+          <h3>The interesting part may be the gap.</h3>
+          <div id="blindOwnership" class="ownership-trail"></div>
+          <blockquote id="blindQuestion"></blockquote>
+          <p id="blindBridge" class="blind-bridge"></p>
+          <div class="blind-actions">
+            <button id="openBlindSpotBtn" class="secondary">Open Blind Spot</button>
+            <button id="toCompassBtn" class="hidden">Carry my words into Compass →</button>
+          </div>
+          <p id="blindBoundary" class="trust-note"></p>
+        </div>
       </div>
     </section>
 
@@ -136,10 +149,31 @@
         <h2>See the road. Keep the steering wheel.</h2>
         <p>Compass may notice, compare, question and remember. It never recommends a life decision.</p>
       </div>
+
+      <div id="compassHandoff" class="handoff-card hidden">
+        <div class="handoff-line"></div>
+        <div class="handoff-step">
+          <span>AI NOTICED</span>
+          <strong id="handoffAI">—</strong>
+        </div>
+        <div class="handoff-arrow">→</div>
+        <div class="handoff-step human-step">
+          <span>YOU DEFINED</span>
+          <strong id="handoffUser">—</strong>
+        </div>
+        <div class="handoff-arrow">→</div>
+        <div class="handoff-step">
+          <span>NOW ASK</span>
+          <strong>Does my road make room for this?</strong>
+        </div>
+      </div>
+
       <div class="grid two">
-        <div class="card">
+        <div class="card road-card">
+          <span class="eyebrow">THE ROAD I'M ON</span>
           <h3>My current chapter</h3>
           <input id="chapter" placeholder="Placement">
+          <textarea id="chapterDescription" placeholder="What is taking most of my attention right now?"></textarea>
           <button id="makeChapter">Create road</button>
         </div>
         <div class="card accent compass-card">
@@ -147,6 +181,23 @@
           <h3>One question, then silence.</h3>
           <div id="compassResult">Define a DNA strand in your own words first.</div>
           <button id="reflect">Look at my road</button>
+        </div>
+      </div>
+
+      <div id="compassReflection" class="compass-reflection hidden">
+        <div class="compass-ownership">
+          <span>AI originally noticed</span>
+          <strong id="compassAIOriginal">—</strong>
+          <span>You defined</span>
+          <strong id="compassUserDefined">—</strong>
+        </div>
+        <div class="road-line"><span></span></div>
+        <div class="compass-silence">
+          <span class="eyebrow">YOUR QUESTION</span>
+          <blockquote id="compassQuestion"></blockquote>
+          <p id="compassBoundary"></p>
+          <div class="silence-mark">…</div>
+          <small>No recommendation follows. The next move is yours.</small>
         </div>
       </div>
     </section>
