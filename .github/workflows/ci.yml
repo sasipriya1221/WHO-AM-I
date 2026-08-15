@@ -10,3 +10,5 @@ jobs:
           python-version: '3.12'
       - run: pip install -e './backend[dev]'
       - run: cd backend && alembic upgrade head && pytest -q
+      - name: Check frontend JavaScript syntax
+        run: node --check frontend/app.js
