@@ -15,9 +15,28 @@ python -m venv .venv
 source .venv/bin/activate   # Windows: .venv\\Scripts\\activate
 pip install -e '.[dev]'
 alembic upgrade head
-uvicorn app.main:app --reload
+uvicorn app.main:app --reload --port 8080
 ```
-Open http://127.0.0.1:8000
+
+Open the app at http://127.0.0.1:8080
+
+Verify the backend health check at http://127.0.0.1:8080/health
+
+Expected health response:
+```json
+{
+  "status": "ok",
+  "service": "who-am-i",
+  "version": "0.2.0"
+}
+```
+
+## Docker
+```bash
+docker compose up --build
+```
+
+Then open http://127.0.0.1:8080
 
 ## Test
 ```bash
