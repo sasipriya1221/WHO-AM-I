@@ -16,3 +16,5 @@ if FRONTEND.exists():
     app.mount("/static",StaticFiles(directory=FRONTEND),name="static")
     @app.get("/")
     def home():return FileResponse(FRONTEND/"index.html")
+    @app.get("/demo",include_in_schema=False)
+    def judge_demo():return FileResponse(FRONTEND/"index.html")

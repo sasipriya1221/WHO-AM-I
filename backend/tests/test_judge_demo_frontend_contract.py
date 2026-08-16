@@ -48,7 +48,7 @@ def test_judge_demo_visually_distinguishes_ai_and_human_ownership():
 
 
 def test_demo_is_loaded_after_core_frontend():
-    assert '<script src="/static/app.js"></script>' in INDEX
-    assert '<script src="/static/vault.js"></script>' in INDEX
-    assert '<script src="/static/demo.js"></script>' in INDEX
+    assert '<script src="/static/app.js?v=cinematic-1"></script>' in INDEX
+    assert '<script src="/static/vault.js?v=cinematic-1"></script>' in INDEX
+    assert '<script src="/static/demo.js?v=cinematic-1"></script>' in INDEX
     assert INDEX.index("app.js") < INDEX.index("demo.js")
