@@ -8,9 +8,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install -e './backend[dev]'
-      - run: cd backend && alembic upgrade head && pytest -q
-      - name: Check frontend JavaScript syntax
+      - name: Install backend and test dependencies
+        run: pip install -e './backend[dev]'
+      - name: Run API, accessibility, cinematic UI, and golden-path regressions
+        run: cd backend && alembic upgrade head && pytest -q
+      - name: Check every frontend JavaScript bundle
         run: |
           node --check frontend/app.js
           node --check frontend/vault.js
