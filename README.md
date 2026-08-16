@@ -184,7 +184,7 @@ uvicorn app.main:app --reload --port 8080
 
 Open:
 
-- Experience: <http://127.0.0.1:8080>
+- Experience: http://127.0.0.1:8080/
 - Deterministic judge path: <http://127.0.0.1:8080/demo>
 - Interactive API documentation: <http://127.0.0.1:8080/docs>
 - Health check: <http://127.0.0.1:8080/health>
