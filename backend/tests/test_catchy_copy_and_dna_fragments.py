@@ -64,9 +64,11 @@ def test_frontend_grows_fragments_before_rendering_thresholded_patterns():
     assert "fragment-new" in APP and "dnaFragmentArrive" in STYLES
     for fragment_total in (4, 8, 12):
         assert f"{fragment_total} FRAGMENTS" in APP
+    assert "to ${Math.min(12,(index+1)*4)} visible fragments" in DEMO
     assert "dataset.clueCount=String(nextCount)" in APP
     assert "dataset.visibleFragments=String(visibleSegments)" in APP
     assert "4 fragments after clue 1, 8 after clue 2, and 12 after clue 3" in README
+    assert "from 4 to 8 to 12 visible fragments" in INDEX
 
     refresh = APP.split("async function refreshDNA", 1)[1].split("async function openReveal", 1)[0]
     assert refresh.index("syncDnaFragments") < refresh.index("const surfaced")

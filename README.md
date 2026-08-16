@@ -22,7 +22,7 @@ WHO AM I? is not a personality test, happiness score, diagnosis, or decision eng
 
 ## The experience, not a dashboard
 
-The images below are captures from the deployed redesigned application and its judge path—not concept art or fabricated mockups.
+The images below are captures from this final repository build and its judge path—not concept art or fabricated mockups.
 
 ![WHO AM I? cinematic portal](docs/screenshots/portal.png)
 

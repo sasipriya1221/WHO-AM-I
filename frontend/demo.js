@@ -54,7 +54,7 @@ async function startJudgeDemo(){
   chapterId=judgeDemo.chapter.id;
   compassStrandId=null;
   demoEl('demoMaya').textContent=judgeDemo.user.display_name;
-  demoEl('demoExperiences').innerHTML=judgeDemo.experiences.map((item,index)=>`<div class="demo-exp clue-fragment"><span>+ CLUE ${index+1} · ${escapeHtml(item.type.replaceAll('_',' '))}</span><b>${escapeHtml(item.label)}</b><small>accepted · one Happiness DNA fragment added</small></div>`).join('');
+  demoEl('demoExperiences').innerHTML=judgeDemo.experiences.map((item,index)=>`<div class="demo-exp clue-fragment"><span>+ CLUE ${index+1} · ${escapeHtml(item.type.replaceAll('_',' '))}</span><b>${escapeHtml(item.label)}</b><small>accepted · helix grows to ${Math.min(12,(index+1)*4)} visible fragments</small></div>`).join('');
   demoEl('demoEntertainment').innerHTML=`Mirror also remembers <b>${escapeHtml(judgeDemo.entertainment.label)}</b> — <code>purpose=${escapeHtml(judgeDemo.entertainment.purpose)}</code>, <code>dna_allowed=${judgeDemo.entertainment.dna_allowed}</code>. It is not part of this inference.`;
   demoEl('demoStartState').classList.remove('hidden');
   setJudgeStep(0,{focus:false});
@@ -75,7 +75,7 @@ async function demoRevealDNA(){
     demoEl('demoDnaState').textContent=`${pattern.status.toUpperCase()} · ${pattern.support} independent supporting clues`;
     demoEl('demoWhyEvidence').innerHTML=why.supporting.map((item,index)=>`<div class="demo-evidence"><span>${index+1}</span><div><b>${escapeHtml(item.summary)}</b><small>${escapeHtml(item.original||'')}</small></div></div>`).join('');
     setJudgeStep(1);
-    say('Judge path · three fragments connected before a Happiness DNA hypothesis surfaced');
+    say('Judge path · 12 fragments connected before a Happiness DNA hypothesis surfaced');
   });
   setJudgeActionAvailability(judgeStep);
 }
