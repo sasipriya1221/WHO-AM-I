@@ -43,7 +43,7 @@ The images below are captures from the deployed redesigned application and its j
 
 | Space | What happens | Boundary that matters |
 |---|---|---|
-| **Mirror — Meet Yourself**<br>*It starts with the little things.* | Low-pressure, interest-aware play makes the space feel familiar and progressively completes the reflection puzzle. | Mirror records are stored for `entertainment` with `dna_allowed=false`; they cannot create Happiness DNA evidence. |
+| **Mirror — Meet Yourself**<br>*It starts with the little things.* | Low-pressure, interest-aware quizzes and mini-games make the space feel familiar and progressively complete the reflection puzzle. The saved interest that triggered the request always selects the activity. | Mirror records are stored for `entertainment` with `dna_allowed=false`; the deterministic play service makes no provider call and cannot create Happiness DNA evidence. |
 | **Happiness DNA — Follow the Clues**<br>*Happiness rarely announces itself. It leaves traces.* | With explicit analysis consent, each accepted experience immediately adds a visible fragment. Only then can separate reflections become provenance-carrying support, contradiction, or contextual evidence. | The interface withholds AI pattern labels until the backend's repeated-pattern threshold is met. A single reflection can never become a repeated pattern. |
 | **Prove yourself wrong / Look Again** | **Why** exposes source reflections. **Prove yourself wrong** calls the unchanged `/challenge` behavior to retrieve supporting and counter-evidence. The person can reject the pattern or replace the AI label with their own words. | A rejected pattern is retired. A renamed strand becomes `user_defined`; human authorship outranks automatic recomputation. |
 | **Compass — Where Are You Going?**<br>*Your road. Your answer.* | The person brings a current life chapter to a cinematic road-and-horizon reflection. Compass asks one tension-revealing question using the person's wording. | Compass refuses unconfirmed AI hypotheses and never recommends a major decision. |
@@ -55,8 +55,9 @@ The product's core is an **Evidence Graph**, implemented through evidence record
 
 ```mermaid
 flowchart TD
-    X["Consented self-discovery experience"] --> G["Purpose + analysis-consent guard"]
-    G --> A["AIProvider boundary<br/>local deterministic or OpenAI-compatible"]
+    X["Consented self-discovery experience"] --> G["Shared eligibility guard<br/>purpose + analysis consent + dna_allowed veto"]
+    G --> SF["Inline safety gate<br/>high-risk text stops before provider access"]
+    SF --> A["AIProvider boundary<br/>local deterministic or OpenAI-compatible"]
     A --> E["Evidence nodes<br/>support · contradict · contextual<br/>provenance + original text"]
     E --> EG["Evidence Graph<br/>PatternEvidence edges"]
     EG --> T["Thresholded pattern state<br/>unknown · emerging · questioned · repeated"]
@@ -75,7 +76,7 @@ flowchart TD
     S -.->|human wording remains authoritative| RC
 ```
 
-Every accepted self-discovery experience that produces evidence adds a visible fragment before the interface considers showing an AI label. The implemented repeated-pattern threshold is unchanged: at least three supporting evidence items from three distinct experiences across at least two experience types. Until that gate is met, fragments can grow but no pattern chip is surfaced. Contradicting evidence moves an eligible pattern to `questioned`; it is surfaced rather than hidden.
+Every accepted self-discovery experience that produces evidence grows the same visible helix: **4 fragments after clue 1, 8 after clue 2, and 12 after clue 3**. This progress is separate from inference. The implemented repeated-pattern threshold is unchanged: at least three supporting evidence items from three distinct experiences across at least two experience types. Until that gate is met, fragments can grow but no pattern chip is surfaced. Contradicting evidence moves an eligible pattern to `questioned`; it is surfaced rather than hidden.
 
 ## Privacy is a data-flow rule
 
@@ -91,13 +92,15 @@ flowchart LR
 
     S["Self-discovery reflection"] --> C{"Explicit DNA and<br/>analysis consent?"}
     C -- "No" --> N["No evidence is admitted"]
-    C -- "Yes" --> SD["purpose=self_discovery"]
-    SD --> D
+    C -- "Yes" --> SD["purpose=self_discovery<br/>dna_allowed is not false"]
+    SD --> R{"Inline high-risk<br/>safety check"}
+    R -- "Blocked" --> B["Rollback<br/>no stored text, provider call,<br/>edge, pattern, or DNA change"]
+    R -- "Allowed" --> D
     D --> G["Evidence Graph"]
     G --> U["Inspectable, contestable,<br/>deletable inference"]
 ```
 
-Purpose and consent are checked **before** a provider receives a reflection. Mirror records are therefore blocked from both the deterministic and hosted AI paths.
+Purpose, consent, the explicit `dna_allowed` veto, and the inline safety check are enforced **before** a provider receives a reflection. High-risk input is rolled back without retention or inference side effects. Mirror records are therefore blocked from both the deterministic and hosted AI paths even if a caller bypasses the frontend or the separate safety-check endpoint.
 
 ## Technology stack
 

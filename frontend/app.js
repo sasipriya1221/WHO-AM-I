@@ -242,11 +242,12 @@ function syncDnaFragments(evidenceItems=[],{animateNewest=false}={}){
   $('#dnaFragmentStatus').textContent=nextCount===0
     ? 'HAPPINESS DNA · NO CLUES YET'
     : nextCount===1
-      ? 'HAPPINESS DNA · + 1 CLUE DISCOVERED'
+      ? 'HAPPINESS DNA · + 1 CLUE DISCOVERED · 4 FRAGMENTS'
       : nextCount===2
-        ? 'HAPPINESS DNA · + ANOTHER CLUE · 2 FRAGMENTS'
-        : `HAPPINESS DNA · ${nextCount} CLUE FRAGMENTS CONNECTED`;
-  $('#dnaRoomVisual').dataset.clueFragments=String(nextCount);
+        ? 'HAPPINESS DNA · + ANOTHER CLUE · 8 FRAGMENTS'
+        : `HAPPINESS DNA · 12 FRAGMENTS · ${nextCount} CLUES CONNECTED`;
+  $('#dnaRoomVisual').dataset.clueCount=String(nextCount);
+  $('#dnaRoomVisual').dataset.visibleFragments=String(visibleSegments);
   dnaFragmentCount=nextCount;
   return {clueCount:nextCount,grew:nextCount>previousCount};
 }
