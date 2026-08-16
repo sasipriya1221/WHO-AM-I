@@ -45,6 +45,20 @@ def test_challenge_copy_makes_counter_evidence_visible():
     assert "semantic similarity" in APP
 
 
+def test_challenge_refresh_preserves_counter_evidence_result():
+    challenge_flow = APP.split("$('#challengeBtn').addEventListener", 1)[1].split(
+        "$('#notMeBtn').addEventListener", 1
+    )[0]
+    assert "const resultMarkup=" in challenge_flow
+    assert challenge_flow.index("const resultMarkup=") < challenge_flow.index(
+        "await refreshDNA()"
+    )
+    assert challenge_flow.index("await refreshDNA()") < challenge_flow.index(
+        "box.innerHTML=resultMarkup"
+    )
+    assert "classList.add('is-questioned')" in challenge_flow
+
+
 def test_rejection_and_rename_copy_preserve_human_authority():
     assert "It will not be treated as your identity or used by Compass." in APP
     assert "The AI's label did not become your identity. Your interpretation did." in APP

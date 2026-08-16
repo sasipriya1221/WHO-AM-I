@@ -294,12 +294,13 @@ $('#challengeBtn').addEventListener('click',async()=>{
   if(!currentPattern)return;
   await runButtonAction($('#challengeBtn'),'Looking for contradictions…',async()=>{
     const data=await api(`/api/v1/dna/${userId}/patterns/${currentPattern}/challenge`,{method:'POST'});
+    const resultMarkup=`<div class="contest-heading"><strong>The AI tried to prove itself wrong.</strong><span>${data.status.replaceAll('_',' ')}</span></div>${data.contradicting.length?data.contradicting.map(item=>`<div class="evidence-line counter"><span aria-hidden="true">↔</span><div><b>${escapeHtml(item.summary)}</b><p>${escapeHtml(item.original||'')}</p><small>semantic similarity ${item.similarity}</small></div></div>`).join(''):'<div class="no-counter"><b>No meaningful counter-evidence surfaced yet.</b><p>That does not make the hypothesis true. It only means the current story is incomplete.</p></div>'}<p class="trust-note">${escapeHtml(data.message||'')}</p>`;
+    await refreshDNA();
     const box=$('#contestResult');
     box.classList.remove('hidden');
-    box.innerHTML=`<div class="contest-heading"><strong>The AI tried to prove itself wrong.</strong><span>${data.status.replaceAll('_',' ')}</span></div>${data.contradicting.length?data.contradicting.map(item=>`<div class="evidence-line counter"><span aria-hidden="true">↔</span><div><b>${escapeHtml(item.summary)}</b><p>${escapeHtml(item.original||'')}</p><small>semantic similarity ${item.similarity}</small></div></div>`).join(''):'<div class="no-counter"><b>No meaningful counter-evidence surfaced yet.</b><p>That does not make the hypothesis true. It only means the current story is incomplete.</p></div>'}<p class="trust-note">${escapeHtml(data.message||'')}</p>`;
+    box.innerHTML=resultMarkup;
     $('#revealStatus').textContent=data.status.replaceAll('_',' ');
-    $('#dnaRoomVisual').class.add('is-questioned');
-    await refreshDNA();
+    $('#dnaRoomVisual').classList.add('is-questioned');
     await loadBlindSpot(false);
     say('Human DNA · the hypothesis has been destabilized');
   });

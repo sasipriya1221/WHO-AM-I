@@ -22,6 +22,7 @@ LABEL_CASE_NAMES = {
     " ": "one-space",
     "   ": "spaces",
     "\n\t ": "newline-tab",
+    "\x00\x1f": "control-characters",
 }
 
 
@@ -77,8 +78,8 @@ def _assert_user_label_validation_error(response) -> None:
 )
 @pytest.mark.parametrize(
     "user_label",
-    ["", " ", "   ", "\n\t "],
-    ids=["empty", "one-space", "spaces", "newline-tab"],
+    ["", " ", "   ", "\n\t ", "\x00\x1f"],
+    ids=["empty", "one-space", "spaces", "newline-tab", "control-characters"],
 )
 def test_rename_rejects_empty_or_whitespace_only_labels(
     client,
@@ -149,6 +150,19 @@ def test_valid_user_rename_is_trimmed_before_storage(client):
     assert after.patterns == before.patterns
     assert len(after.dna_strands) == 1
     assert after.dna_strands[0][3:] == (VALID_LABEL, "user_defined")
+
+
+def test_user_rename_rejects_labels_over_storage_limit(client):
+    user_id, strand_id = _seed_strand(email="rename-too-long@demo.local")
+    before = app_database_inference_snapshot(user_id)
+
+    response = client.post(
+        f"/api/v1/dna/{user_id}/strands/{strand_id}/rename",
+        json={"user_label": "x" * 201},
+    )
+
+    _assert_user_label_validation_error(response)
+    assert_no_inference_side_effects(before, app_database_inference_snapshot(user_id))
 
 
 def test_compass_rejects_legacy_user_defined_strand_with_blank_label(client):

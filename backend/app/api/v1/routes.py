@@ -8,6 +8,7 @@ from app.models.entities import *
 from app.schemas.common import *
 from app.services.dna.engine import extract_evidence, recompute_patterns
 from app.services.evidence.semantic import support_and_counter_evidence
+from app.services.safety import assess_dna_text
 
 router = APIRouter(prefix="/api/v1")
 
@@ -304,7 +305,12 @@ def compass_reflect(user_id: str, payload: CompassReflect, db: Session = Depends
             "note": "Compass refuses to use an unconfirmed AI hypothesis.",
         }
 
-    label = strand.user_label or strand.ai_original_label
+    label = (strand.user_label or "").strip()
+    if not label:
+        raise HTTPException(
+            409,
+            "Compass cannot use a user-defined strand with a blank user label.",
+        )
     return {
         "type": "question",
         "strand_id": strand.id,
@@ -341,6 +347,9 @@ def delete_evidence(user_id: str, evidence_id: str, db: Session = Depends(get_db
 
 @router.post("/safety/check")
 def safety(payload: SafetyCheck):
-    text = payload.text.lower()
-    high = any(x in text for x in ["kill myself", "suicide", "self harm", "hurt myself"])
-    return {"allow_dna_processing": not high, "risk": "high" if high else "normal", "note": "High-risk content must not become Happiness DNA evidence."}
+    assessment = assess_dna_text(payload.text)
+    return {
+        "allow_dna_processing": assessment.allow_dna_processing,
+        "risk": assessment.risk,
+        "note": "High-risk content must not become Happiness DNA evidence.",
+    }
