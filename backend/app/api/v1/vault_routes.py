@@ -105,7 +105,7 @@ def inference_map(user_id: str, db: Session = Depends(get_db)):
         ],
         "self_discovery": evidence_payload,
         "dna": dna_payload,
-        "principle": "If you remove part of your story, AI loses the right to use that evidence.",
+        "principle": "If this clue leaves your story, it leaves my understanding too.",
     }
 
 
@@ -131,7 +131,7 @@ def preview_evidence_impact(user_id: str, evidence_id: str, db: Session = Depend
             "evidence_type": evidence.evidence_type.value,
         },
         "affected_patterns": affected,
-        "warning": "Deleting this reflection removes its graph links before DNA is recalculated.",
+        "warning": "If this clue leaves your story, it leaves my understanding too.",
     }
 
 
@@ -192,5 +192,5 @@ def delete_evidence_with_impact(user_id: str, evidence_id: str, db: Session = De
         "deleted": deleted_evidence,
         "recalculated": True,
         "changes": changes,
-        "principle": "The deleted reflection is no longer available to support or challenge DNA.",
+        "principle": "If this clue leaves your story, it leaves my understanding too.",
     }

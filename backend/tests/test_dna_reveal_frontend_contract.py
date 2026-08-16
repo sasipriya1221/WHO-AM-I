@@ -13,7 +13,7 @@ def test_reveal_screen_exposes_all_contestable_controls():
         assert f'id="{control_id}"' in INDEX
 
     assert "AI hypotheses are dotted. Your definitions are solid." in INDEX
-    assert "AI noticed this. You decide what it means." in INDEX
+    assert "AI reflects. You decide." in INDEX
     assert "The AI's words do not have to become yours." in INDEX
 
 
@@ -48,4 +48,4 @@ def test_challenge_copy_makes_counter_evidence_visible():
 def test_rejection_and_rename_copy_preserve_human_authority():
     assert "It will not be treated as your identity or used by Compass." in APP
     assert "The AI's label did not become your identity. Your interpretation did." in APP
-    assert "Defined by you. Mirror originally suggested" in APP
+    assert "Defined by you. AI originally suggested" in APP
