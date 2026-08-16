@@ -127,7 +127,7 @@ def test_vault_frontend_contract_contains_preview_delete_and_before_after_states
     assert "See impact" in js
     assert "Delete reflection & recalculate DNA" in js
     assert "BEFORE" in js and "AFTER" in js
-    assert "Your definition stayed yours" in js
+    assert "Your meaning was yours. Only my evidence changed." in js
     assert "AI NOTICED" in js and "YOU DEFINED" in js
     assert ".state-change" in css
     assert ".vault-owner-trail" in css

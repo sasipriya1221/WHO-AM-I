@@ -182,7 +182,7 @@ def challenge_pattern(user_id: str, pattern_id: str, db: Session = Depends(get_d
         "pattern": pattern.ai_label,
         "status": pattern.status.value,
         **result,
-        "message": "Here is evidence that supports and challenges this clue. You decide what it means.",
+        "message": "Here is evidence that supports this clue and evidence that may prove it wrong. You decide what it means.",
     }
 
 
@@ -243,7 +243,7 @@ def blind_spot(user_id: str, strand_id: str, db: Session = Depends(get_db)):
         )
         if pattern_status == PatternStatus.QUESTIONED.value:
             question = (
-                f"The AI first called this ‘{ai_label}’, and conflicting clues challenged that label. "
+                f"The AI first called this ‘{ai_label}’, and conflicting clues tested that label. "
                 f"You chose ‘{user_label}’. What changes when you use your words instead of the AI's?"
             )
         return {
@@ -269,7 +269,7 @@ def blind_spot(user_id: str, strand_id: str, db: Session = Depends(get_db)):
             "pattern_status": pattern_status,
             "support_count": support_count,
             "contradiction_count": contradiction_count,
-            "question": f"‘{ai_label}’ was challenged by conflicting clues. In which situations does it fit, and in which situations does it not?",
+            "question": f"‘{ai_label}’ met conflicting clues. In which situations does it fit, and in which situations does it not?",
             "bridge_text": "Before Compass uses this, define the part that feels true in your own words.",
             "can_enter_compass": False,
             "boundary": "The AI can surface the contradiction. Only you can interpret it.",
@@ -284,7 +284,7 @@ def blind_spot(user_id: str, strand_id: str, db: Session = Depends(get_db)):
         "support_count": support_count,
         "contradiction_count": contradiction_count,
         "question": f"The AI noticed ‘{ai_label}’. Before carrying it forward, what part of that label feels incomplete or too simple?",
-        "bridge_text": "Challenge or define this clue before Compass uses it.",
+        "bridge_text": "Ask the AI to prove this clue wrong or define it before Compass uses it.",
         "can_enter_compass": False,
         "boundary": "An AI hypothesis is not a user identity.",
     }
