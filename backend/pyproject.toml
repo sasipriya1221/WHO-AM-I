@@ -27,3 +27,6 @@ exclude = ["alembic*", "tests*"]
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
+markers = [
+  "security: security and privacy boundary regression tests",
+]
