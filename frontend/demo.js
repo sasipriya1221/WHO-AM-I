@@ -1,6 +1,6 @@
 let judgeDemo=null;
 let judgeStep=0;
-const demoSteps=['Experience','Human DNA','Challenge','Human Rename','Compass','Delete','DNA weakens'];
+const demoSteps=['Experience','Happiness DNA','Prove It Wrong','Look Again','Compass','Vault','DNA weakens'];
 const demoScenes=['experience','dna','challenge','rename','compass','delete','weakens'];
 const demoActionIds=['demoRevealBtn','demoChallengeBtn','demoRenameBtn','demoCompassBtn','demoDeletePreviewBtn','demoDeleteBtn'];
 
@@ -54,7 +54,7 @@ async function startJudgeDemo(){
   chapterId=judgeDemo.chapter.id;
   compassStrandId=null;
   demoEl('demoMaya').textContent=judgeDemo.user.display_name;
-  demoEl('demoExperiences').innerHTML=judgeDemo.experiences.map((item,index)=>`<div class="demo-exp"><span>CLUE ${index+1} · ${escapeHtml(item.type.replaceAll('_',' '))}</span><b>${escapeHtml(item.label)}</b><small>consented self-discovery evidence</small></div>`).join('');
+  demoEl('demoExperiences').innerHTML=judgeDemo.experiences.map((item,index)=>`<div class="demo-exp clue-fragment"><span>+ CLUE ${index+1} · ${escapeHtml(item.type.replaceAll('_',' '))}</span><b>${escapeHtml(item.label)}</b><small>accepted · helix grows to ${Math.min(12,(index+1)*4)} visible fragments</small></div>`).join('');
   demoEl('demoEntertainment').innerHTML=`Mirror also remembers <b>${escapeHtml(judgeDemo.entertainment.label)}</b> — <code>purpose=${escapeHtml(judgeDemo.entertainment.purpose)}</code>, <code>dna_allowed=${judgeDemo.entertainment.dna_allowed}</code>. It is not part of this inference.`;
   demoEl('demoStartState').classList.remove('hidden');
   setJudgeStep(0,{focus:false});
@@ -75,19 +75,19 @@ async function demoRevealDNA(){
     demoEl('demoDnaState').textContent=`${pattern.status.toUpperCase()} · ${pattern.support} independent supporting clues`;
     demoEl('demoWhyEvidence').innerHTML=why.supporting.map((item,index)=>`<div class="demo-evidence"><span>${index+1}</span><div><b>${escapeHtml(item.summary)}</b><small>${escapeHtml(item.original||'')}</small></div></div>`).join('');
     setJudgeStep(1);
-    say('Judge path · repeated evidence surfaced a Human DNA hypothesis');
+    say('Judge path · 12 fragments connected before a Happiness DNA hypothesis surfaced');
   });
   setJudgeActionAvailability(judgeStep);
 }
 
 async function demoChallenge(){
   if(!judgeDemo)return;
-  await runButtonAction(demoEl('demoChallengeBtn'),'Seeking counter-evidence…',async()=>{
+  await runButtonAction(demoEl('demoChallengeBtn'),'Trying to prove this wrong…',async()=>{
     const data=await api(`/api/v1/dna/${userId}/patterns/${currentPattern}/challenge`,{method:'POST'});
     demoEl('demoChallengeState').textContent=data.status.replaceAll('_',' ');
     demoEl('demoCounters').innerHTML=data.contradicting.length?data.contradicting.map(item=>`<div class="demo-counter"><b>${escapeHtml(item.summary)}</b><p>${escapeHtml(item.original||'')}</p><small>Counter-evidence found by semantic retrieval</small></div>`).join(''):'<div class="demo-counter">No counter-evidence surfaced.</div>';
     setJudgeStep(2);
-    say('Judge path · Challenge destabilized the AI hypothesis');
+    say('Judge path · the AI tried to prove itself wrong');
   });
   setJudgeActionAvailability(judgeStep);
 }
@@ -101,7 +101,7 @@ async function demoRename(){
     demoEl('demoRenameMessage').textContent='The AI’s original label stays traceable. The human-defined meaning now has authority.';
     compassStrandId=currentStrand;
     setJudgeStep(3);
-    say('Judge path · Human Rename made Maya’s words authoritative');
+    say('Judge path · Look Again made Maya’s words authoritative');
   });
   setJudgeActionAvailability(judgeStep);
 }
@@ -114,7 +114,7 @@ async function demoCompass(){
     demoEl('demoCompassQuestion').textContent=result.text;
     demoEl('demoCompassBoundary').textContent=result.boundary||result.note;
     setJudgeStep(4);
-    say('Judge path · Compass used Maya’s language and stopped at one question');
+    say('Judge path · Your road. Your answer. Compass stopped at one question');
   });
   setJudgeActionAvailability(judgeStep);
 }
@@ -128,7 +128,7 @@ async function demoPreviewDelete(){
     const affected=impact.affected_patterns.find(item=>item.pattern_id===currentPattern)||impact.affected_patterns[0];
     demoEl('demoDeleteImpact').innerHTML=affected?`${demoOwnership(affected.ai_label,affected.user_label)}<p>This reflection currently contributes <b>${escapeHtml(affected.relationship)}</b> evidence to a <b>${escapeHtml(affected.pattern_status)}</b> pattern with <b>${affected.support_count}</b> supporting clues.</p>`:'<p>No affected pattern.</p>';
     setJudgeStep(5);
-    say('Judge path · Vault exposed the inference link before deletion');
+    say('Judge path · Your Story. Your Control. Vault exposed the inference link before deletion');
   });
   setJudgeActionAvailability(judgeStep);
 }
@@ -146,7 +146,7 @@ async function demoDeleteAndWeaken(){
     demoEl('demoAfterStatus').textContent=change.after.pattern_status;
     demoEl('demoAfterSupport').textContent=`${change.after.support_count} supporting clues`;
     demoEl('demoWeakenMessage').textContent=change.message;
-    demoEl('demoOwnershipPreserved').textContent=change.ownership_preserved?'Your definition stayed yours; only the AI evidence state changed.':'Ownership state changed.';
+    demoEl('demoOwnershipPreserved').textContent=change.ownership_preserved?'Your meaning was yours. Only my evidence changed.':'Ownership state changed.';
     setJudgeStep(6);
     await refreshDNA();
     say('Judge path complete · deleted evidence lost its influence');

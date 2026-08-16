@@ -16,6 +16,7 @@ from app.models.entities import (
     StrandStatus,
 )
 from app.services.evidence.guard import assert_dna_eligible
+from app.services.safety import assert_safe_for_dna
 
 
 def _flatten(value):
@@ -33,14 +34,15 @@ def extract_evidence(
 ):
     """Extract structured evidence through a pluggable AI provider.
 
-    Purpose + consent are checked before any provider receives the reflection.
-    Mirror entertainment records therefore cannot be routed through this path.
+    Purpose, consent, dna_allowed, and safety are checked before any provider
+    receives the reflection. Blocked text cannot create downstream evidence.
     """
     assert_dna_eligible(experience)
-    provider = provider or get_ai_provider()
     text = _flatten(experience.raw_response).strip()
     if not text:
         return []
+    assert_safe_for_dna(text)
+    provider = provider or get_ai_provider()
 
     candidates = provider.extract_evidence(text, experience.experience_type.value)
     created: list[Evidence] = []

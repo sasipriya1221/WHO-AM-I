@@ -10,6 +10,8 @@ jobs:
           python-version: '3.12'
       - name: Install backend and test dependencies
         run: pip install -e './backend[dev]'
+      - name: Security/privacy regression gate
+        run: cd backend && pytest -q -m security
       - name: Run API, accessibility, cinematic UI, and golden-path regressions
         run: cd backend && alembic upgrade head && pytest -q
       - name: Check every frontend JavaScript bundle

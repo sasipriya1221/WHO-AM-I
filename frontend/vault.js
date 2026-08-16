@@ -42,7 +42,7 @@ async function refreshVault(){
       <div class="memory-corridor">
         <section class="memory-drawer entertainment-drawer" aria-labelledby="entertainmentDrawerTitle">
           <div class="drawer-handle" aria-hidden="true"></div>
-          <div class="drawer-heading"><span>DRAWER A · JUST FOR FAMILIARITY</span><h3 id="entertainmentDrawerTitle">Things you enjoy</h3><p>Useful for play. Permanently forbidden from Human DNA.</p></div>
+          <div class="drawer-heading"><span>DRAWER A · JUST FOR FAMILIARITY</span><h3 id="entertainmentDrawerTitle">Things you enjoy</h3><p>Useful for play. Permanently forbidden from Happiness DNA.</p></div>
           <div class="drawer-contents">
             ${entertainment.map(item=>`<article class="vault-memory"><div><small>${escapeHtml(item.purpose)}</small><b>${escapeHtml(item.label)}</b></div><span class="purpose-tag">DNA access: ${item.dna_allowed?'allowed':'denied'}</span></article>`).join('')||'<p class="soft-copy">Nothing is stored in this drawer yet.</p>'}
           </div>
@@ -50,9 +50,9 @@ async function refreshVault(){
 
         <section class="memory-drawer dna-drawer" aria-labelledby="dnaDrawerTitle">
           <div class="drawer-handle" aria-hidden="true"></div>
-          <div class="drawer-heading"><span>DRAWER B · MEANING YOU CHOSE TO EXPLORE</span><h3 id="dnaDrawerTitle">Current Human DNA</h3><p>Your wording and the AI evidence state remain visibly separate.</p></div>
+          <div class="drawer-heading"><span>DRAWER B · MEANING YOU CHOSE TO EXPLORE</span><h3 id="dnaDrawerTitle">Current Happiness DNA</h3><p>Your wording and the AI evidence state remain visibly separate.</p></div>
           <div class="drawer-contents">
-            ${dna.map(item=>`<article class="vault-dna-card ${item.user_label?'human-owned':'ai-owned'}">${ownershipTrail(item)}<div class="vault-strength"><span>Evidence state</span><b>${escapeHtml(vaultStatusLabel(item.pattern_status))}</b><small>${item.support_count} supporting · ${item.contradiction_count} challenging</small></div></article>`).join('')||'<p class="soft-copy">No Human DNA patterns have surfaced.</p>'}
+            ${dna.map(item=>`<article class="vault-dna-card ${item.user_label?'human-owned':'ai-owned'}">${ownershipTrail(item)}<div class="vault-strength"><span>Evidence state</span><b>${escapeHtml(vaultStatusLabel(item.pattern_status))}</b><small>${item.support_count} supporting · ${item.contradiction_count} counter-evidence</small></div></article>`).join('')||'<p class="soft-copy">No Happiness DNA patterns have surfaced.</p>'}
           </div>
         </section>
       </div>
@@ -63,7 +63,7 @@ async function refreshVault(){
         <div class="evidence-stack">
           ${evidence.map(item=>{
             const affect=item.affects?.[0];
-            const impact=affect?`Supports <b>${escapeHtml(affect.display_label)}</b> · currently ${escapeHtml(vaultStatusLabel(affect.pattern_status))}`:'Not currently linked to a surfaced Human DNA pattern';
+            const impact=affect?`Supports <b>${escapeHtml(affect.display_label)}</b> · currently ${escapeHtml(vaultStatusLabel(affect.pattern_status))}`:'Not currently linked to a surfaced Happiness DNA pattern';
             return `<article class="vault-evidence-card"><div class="vault-evidence-copy"><span class="evidence-kind">${escapeHtml(item.experience_type||'reflection')} · ${escapeHtml(item.evidence_type)}</span><b>${escapeHtml(item.concept)}</b><p>${escapeHtml(item.summary)}</p><small>${impact}</small></div><div class="vault-evidence-actions"><button type="button" class="quiet-button impact-btn" data-impact="${escapeHtml(item.id)}" aria-label="See impact of ${escapeHtml(item.concept)}">See impact</button><button type="button" class="delete delete-impact" data-delete-impact="${escapeHtml(item.id)}" aria-label="Review deletion impact for ${escapeHtml(item.concept)}">Forget reflection</button></div></article>`;
           }).join('')||'<p class="soft-copy">No self-discovery evidence is stored.</p>'}
         </div>
@@ -86,7 +86,7 @@ async function previewVaultImpact(id,readyToDelete=false){
       <div class="impact-kicker">BEFORE YOU FORGET</div>
       <h3>This is what the reflection currently influences.</h3>
       <div class="impact-evidence"><span>REFLECTION</span><b>${escapeHtml(data.evidence.summary)}</b><small>${escapeHtml(data.evidence.original||'')}</small></div>
-      ${affected.length?affected.map(item=>`<div class="impact-link"><div class="impact-line" aria-hidden="true"></div>${ownershipTrail(item)}<div class="impact-state"><span>Current evidence state</span><b>${escapeHtml(vaultStatusLabel(item.pattern_status))}</b><small>${item.support_count} supporting clue(s)</small></div></div>`).join(''):'<div class="no-counter"><b>No surfaced Human DNA pattern currently depends on this clue.</b></div>'}
+      ${affected.length?affected.map(item=>`<div class="impact-link"><div class="impact-line" aria-hidden="true"></div>${ownershipTrail(item)}<div class="impact-state"><span>Current evidence state</span><b>${escapeHtml(vaultStatusLabel(item.pattern_status))}</b><small>${item.support_count} supporting clue(s)</small></div></div>`).join(''):'<div class="no-counter"><b>No surfaced Happiness DNA pattern currently depends on this clue.</b></div>'}
       <p class="trust-note">${escapeHtml(data.warning)}</p>
       <div class="impact-actions"><button id="cancelImpact" type="button" class="quiet-button">Keep it</button><button id="confirmImpactDelete" type="button" class="delete">Delete reflection &amp; recalculate DNA</button></div>`;
     $('#cancelImpact').addEventListener('click',()=>{
@@ -106,7 +106,7 @@ async function confirmVaultDeletion(){
   const button=$('#confirmImpactDelete');
   button.disabled=true;
   button.setAttribute('aria-busy','true');
-  button.textContent='Recalculating Human DNA…';
+  button.textContent='Recalculating Happiness DNA…';
   try{
     const data=await api(`/api/v1/vault/${userId}/evidence/${pendingVaultEvidenceId}/with-impact`,{method:'DELETE'});
     const box=$('#vaultImpactStory');
@@ -116,13 +116,13 @@ async function confirmVaultDeletion(){
       <div class="impact-kicker">DNA RECALCULATED</div>
       <h3>The deleted reflection no longer has a vote.</h3>
       <div class="impact-evidence deleted"><span>FORGOTTEN</span><b>${escapeHtml(data.deleted.summary)}</b></div>
-      ${changes.length?changes.map(change=>`<div class="before-after">${ownershipTrail(change.after)}<div class="state-change"><div><small>BEFORE</small><b>${escapeHtml(vaultStatusLabel(change.before.pattern_status))}</b><span>${change.before.support_count} supporting</span></div><div class="state-arrow" aria-hidden="true">→</div><div class="after-state"><small>AFTER</small><b>${escapeHtml(vaultStatusLabel(change.after.pattern_status))}</b><span>${change.after.support_count} supporting</span></div></div><p>${escapeHtml(change.message)}</p><small class="ownership-preserved">${change.ownership_preserved?'Your definition stayed yours; only the AI evidence state changed.':'Ownership state also changed.'}</small></div>`).join(''):'<p class="soft-copy">No surfaced pattern changed, but the reflection has still been removed from future inference.</p>'}
+      ${changes.length?changes.map(change=>`<div class="before-after">${ownershipTrail(change.after)}<div class="state-change"><div><small>BEFORE</small><b>${escapeHtml(vaultStatusLabel(change.before.pattern_status))}</b><span>${change.before.support_count} supporting</span></div><div class="state-arrow" aria-hidden="true">→</div><div class="after-state"><small>AFTER</small><b>${escapeHtml(vaultStatusLabel(change.after.pattern_status))}</b><span>${change.after.support_count} supporting</span></div></div><p>${escapeHtml(change.message)}</p><small class="ownership-preserved">${change.ownership_preserved?'Your meaning was yours. Only my evidence changed.':'Ownership state also changed.'}</small></div>`).join(''):'<p class="soft-copy">No surfaced pattern changed, but the reflection has still been removed from future inference.</p>'}
       <p class="trust-note">${escapeHtml(data.principle)}</p>
       <button id="closeImpact" type="button" class="quiet-button">Return to my memory</button>`;
     $('#closeImpact').addEventListener('click',()=>refreshVault());
     pendingVaultEvidenceId=null;
     await refreshDNA();
-    say(changes.some(change=>change.changed)?'Vault · Human DNA weakened because evidence was removed':'Vault · reflection forgotten');
+    say(changes.some(change=>change.changed)?'Vault · Happiness DNA weakened because evidence was removed':'Vault · reflection forgotten');
     $('#closeImpact').focus({preventScroll:true});
   }catch(error){
     handleError(error,'The reflection could not be deleted');

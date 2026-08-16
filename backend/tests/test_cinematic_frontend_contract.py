@@ -70,11 +70,11 @@ def test_judge_path_is_separate_but_complete():
     assert len(demo_steps := demoSteps_from_source()) == 7
     assert demo_steps == [
         "Experience",
-        "Human DNA",
-        "Challenge",
-        "Human Rename",
+        "Happiness DNA",
+        "Prove It Wrong",
+        "Look Again",
         "Compass",
-        "Delete",
+        "Vault",
         "DNA weakens",
     ]
     for scene in ("experience", "dna", "challenge", "rename", "compass", "delete", "weakens"):
@@ -147,5 +147,5 @@ def test_all_golden_path_frontend_calls_still_target_existing_api_contracts():
     for endpoint in required:
         assert endpoint in source
 
-    assert "Your definition stayed yours; only the AI evidence state changed." in source
+    assert "Your meaning was yours. Only my evidence changed." in source
     assert "No recommendation follows" in INDEX

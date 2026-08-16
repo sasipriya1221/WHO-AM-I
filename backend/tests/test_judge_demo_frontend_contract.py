@@ -11,7 +11,8 @@ def test_judge_demo_exposes_all_golden_path_steps():
     for text in [
         "Experience",
         "HAPPINESS DNA",
-        "CHALLENGE",
+        "PROVE YOURSELF WRONG",
+        "LOOK AGAIN",
         "HUMAN RENAME",
         "COMPASS",
         "VAULT",
@@ -21,7 +22,7 @@ def test_judge_demo_exposes_all_golden_path_steps():
 
     assert "AI NOTICED" in INDEX
     assert "YOU DEFINED" in INDEX
-    assert "Your definition stayed yours" in INDEX
+    assert "Your meaning was yours. Only my evidence changed." in INDEX
     assert "No recommendation follows" in INDEX
 
 

@@ -8,6 +8,8 @@ from app.models.entities import *
 from app.schemas.common import *
 from app.services.dna.engine import extract_evidence, recompute_patterns
 from app.services.evidence.semantic import support_and_counter_evidence
+from app.services.mirror.playful import build_playful_activity
+from app.services.safety import assess_dna_text
 
 router = APIRouter(prefix="/api/v1")
 
@@ -68,17 +70,35 @@ def add_interest(user_id: str, payload: InterestCreate, db: Session = Depends(ge
 
 
 @router.get("/mirror/{user_id}/game")
-def get_game(user_id: str, db: Session = Depends(get_db)):
-    interests = db.scalars(select(MirrorInterest).where(MirrorInterest.user_id == user_id)).all()
-    if not interests:
-        return {"title": "Quick hello", "question": "Tell Mirror one series, game, or sport you enjoy.", "options": []}
-    name = interests[0].name
-    lower = name.lower()
-    if "throne" in lower:
-        return {"title": "Your GOT challenge", "question": "What are the words of House Stark?", "options": ["Winter is Coming", "Fire and Blood", "Hear Me Roar"], "answer": "Winter is Coming", "note": "Entertainment only — never DNA evidence."}
-    if "angry" in lower:
-        return {"title": "Angry Birds-inspired puzzle", "question": "A target is behind a tall wall. Which launch is most likely to clear it?", "options": ["Low angle", "Medium angle", "High arc"], "answer": "High arc", "note": "Entertainment only — never DNA evidence."}
-    return {"title": f"A little {name} moment", "question": f"What do you enjoy most about {name}?", "options": ["The challenge", "The story", "The people", "Just fun"], "note": "Entertainment only — never DNA evidence."}
+def get_game(
+    user_id: str,
+    interest_id: str | None = None,
+    db: Session = Depends(get_db),
+):
+    user_or_404(db, user_id)
+    query = select(MirrorInterest).where(MirrorInterest.user_id == user_id)
+    if interest_id:
+        query = query.where(MirrorInterest.id == interest_id)
+    else:
+        query = query.order_by(
+            MirrorInterest.updated_at.desc(),
+            MirrorInterest.created_at.desc(),
+        )
+    interest = db.scalar(query)
+    if interest_id and not interest:
+        raise HTTPException(404, "Mirror interest not found")
+    if not interest:
+        return {
+            "interest_id": None,
+            "title": "Quick hello",
+            "question": "Tell Mirror one series, game, sport, or hobby you enjoy.",
+            "options": [],
+            "interaction": "prompt",
+            "purpose": DataPurpose.ENTERTAINMENT.value,
+            "dna_allowed": False,
+            "note": "Entertainment only — no psychological interpretation and never Happiness DNA evidence.",
+        }
+    return build_playful_activity(interest)
 
 
 @router.post("/dna/{user_id}/consent")
@@ -162,7 +182,7 @@ def challenge_pattern(user_id: str, pattern_id: str, db: Session = Depends(get_d
         "pattern": pattern.ai_label,
         "status": pattern.status.value,
         **result,
-        "message": "Here is evidence that supports and challenges this clue. You decide what it means.",
+        "message": "Here is evidence that supports this clue and evidence that may prove it wrong. You decide what it means.",
     }
 
 
@@ -223,7 +243,7 @@ def blind_spot(user_id: str, strand_id: str, db: Session = Depends(get_db)):
         )
         if pattern_status == PatternStatus.QUESTIONED.value:
             question = (
-                f"The AI first called this ‘{ai_label}’, and conflicting clues challenged that label. "
+                f"The AI first called this ‘{ai_label}’, and conflicting clues tested that label. "
                 f"You chose ‘{user_label}’. What changes when you use your words instead of the AI's?"
             )
         return {
@@ -249,7 +269,7 @@ def blind_spot(user_id: str, strand_id: str, db: Session = Depends(get_db)):
             "pattern_status": pattern_status,
             "support_count": support_count,
             "contradiction_count": contradiction_count,
-            "question": f"‘{ai_label}’ was challenged by conflicting clues. In which situations does it fit, and in which situations does it not?",
+            "question": f"‘{ai_label}’ met conflicting clues. In which situations does it fit, and in which situations does it not?",
             "bridge_text": "Before Compass uses this, define the part that feels true in your own words.",
             "can_enter_compass": False,
             "boundary": "The AI can surface the contradiction. Only you can interpret it.",
@@ -264,7 +284,7 @@ def blind_spot(user_id: str, strand_id: str, db: Session = Depends(get_db)):
         "support_count": support_count,
         "contradiction_count": contradiction_count,
         "question": f"The AI noticed ‘{ai_label}’. Before carrying it forward, what part of that label feels incomplete or too simple?",
-        "bridge_text": "Challenge or define this clue before Compass uses it.",
+        "bridge_text": "Ask the AI to prove this clue wrong or define it before Compass uses it.",
         "can_enter_compass": False,
         "boundary": "An AI hypothesis is not a user identity.",
     }
@@ -304,7 +324,12 @@ def compass_reflect(user_id: str, payload: CompassReflect, db: Session = Depends
             "note": "Compass refuses to use an unconfirmed AI hypothesis.",
         }
 
-    label = strand.user_label or strand.ai_original_label
+    label = (strand.user_label or "").strip()
+    if not label:
+        raise HTTPException(
+            409,
+            "Compass cannot use a user-defined strand with a blank user label.",
+        )
     return {
         "type": "question",
         "strand_id": strand.id,
@@ -341,6 +366,9 @@ def delete_evidence(user_id: str, evidence_id: str, db: Session = Depends(get_db
 
 @router.post("/safety/check")
 def safety(payload: SafetyCheck):
-    text = payload.text.lower()
-    high = any(x in text for x in ["kill myself", "suicide", "self harm", "hurt myself"])
-    return {"allow_dna_processing": not high, "risk": "high" if high else "normal", "note": "High-risk content must not become Happiness DNA evidence."}
+    assessment = assess_dna_text(payload.text)
+    return {
+        "allow_dna_processing": assessment.allow_dna_processing,
+        "risk": assessment.risk,
+        "note": "High-risk content must not become Happiness DNA evidence.",
+    }

@@ -68,6 +68,7 @@
 .demo-exp span { color: var(--cyan); font-size: .55rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
 .demo-exp b { margin: .3rem 0; font: 400 1rem var(--display); }
 .demo-exp small { color: var(--muted); font-size: .62rem; }
+.demo-exp.clue-fragment { background: radial-gradient(circle at 50% 0, rgba(134, 236, 229, .09), transparent 55%), #0b0e16; box-shadow: inset 0 2px rgba(134, 236, 229, .22); }
 .ownership-demo { display: flex; gap: .7rem; align-items: center; flex-wrap: wrap; margin: 1.2rem 0; }
 .ownership-demo .node { min-width: 175px; padding: .85rem 1rem; border: 1px dashed rgba(159, 140, 255, .66); background: rgba(16, 18, 30, .8); }
 .ownership-demo .node.human{border-style:solid;border-color:var(--cyan);background:rgba(134,236,229,.07)}
@@ -93,6 +94,7 @@
 .demo-finale h3 { color: var(--ink); }
 .demo-finale #demoOwnershipPreserved, .demo-finale strong { color: var(--cyan); }
 .demo-finale .demo-principle { grid-template-columns: auto 1fr; }
+.demo-continuation { margin-top: 1.4rem; color: var(--cyan) !important; font: italic clamp(1.1rem, 2vw, 1.45rem) var(--display); }
 
 @keyframes demoIn { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: none; } }
 @keyframes demoFracture { 25% { transform: translate(-48%, -50%); } 75% { transform: translate(-52%, -50%); } }

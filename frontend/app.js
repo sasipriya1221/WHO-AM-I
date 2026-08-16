@@ -1,10 +1,11 @@
 let userId=null,chapterId=null,currentPattern=null,currentStrand=null,compassStrandId=null,lastBlindSpot=null;
 let mirrorStage=0;
+let dnaFragmentCount=0;
 
 const $=selector=>document.querySelector(selector);
 const $$=selector=>[...document.querySelectorAll(selector)];
 const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const viewTitles={portal:'WHO AM I?',mirror:'Mirror',dna:'Human DNA',compass:'Compass',vault:'Vault',demo:'Judge Path'};
+const viewTitles={portal:'WHO AM I?',mirror:'Meet Yourself',dna:'Follow the Clues',compass:'Where Are You Going?',vault:'Your Story. Your Control.',demo:'Judge Path'};
 
 async function api(path,opts={}){
   const response=await fetch(path,{headers:{'Content-Type':'application/json'},...opts});
@@ -152,22 +153,29 @@ $('#interestForm').addEventListener('submit',async event=>{
     return;
   }
   await runButtonAction($('#saveInterest'),'Remembering…',async()=>{
-    await api(`/api/v1/mirror/${userId}/interests`,{method:'POST',body:JSON.stringify({category:$('#interestType').value,name:interest})});
+    const savedInterest=await api(`/api/v1/mirror/${userId}/interests`,{method:'POST',body:JSON.stringify({category:$('#interestType').value,name:interest})});
     setMirrorStage(2);
-    say('Mirror remembers this for play—not for Human DNA');
-    await loadGame();
+    say('Mirror remembers this for play—not for Happiness DNA');
+    await loadGame(savedInterest.id);
   });
 });
 
-async function loadGame(){
+async function loadGame(interestId=null){
   if(!needUser())return;
   try{
-    const game=await api(`/api/v1/mirror/${userId}/game`);
-    $('#game').innerHTML=`<b>${escapeHtml(game.title)}</b><p>${escapeHtml(game.question)}</p>${(game.options||[]).map(option=>`<button type="button" class="mini-answer">${escapeHtml(option)}</button>`).join('')}<p class="tiny">${escapeHtml(game.note||'')}</p>`;
-    $$('.mini-answer').forEach(answer=>answer.addEventListener('click',()=>{
-      $$('.mini-answer').forEach(item=>item.classList.toggle('selected',item===answer));
+    const suffix=interestId?`?interest_id=${encodeURIComponent(interestId)}`:'';
+    const game=await api(`/api/v1/mirror/${userId}/game${suffix}`);
+    const entertainmentOnly=game.purpose==='entertainment'&&game.dna_allowed===false;
+    if(!entertainmentOnly)throw new Error('Mirror refused a response without the entertainment-only boundary');
+    $('#game').innerHTML=`<div class="mini-game-meta"><span>${escapeHtml((game.interaction||'play').replaceAll('_',' '))}</span><span>Entertainment only</span></div><b>${escapeHtml(game.title)}</b><p>${escapeHtml(game.question)}</p><div class="mini-answer-grid">${(game.options||[]).map(option=>`<button type="button" class="mini-answer">${escapeHtml(option)}</button>`).join('')}</div><p id="gameFeedback" class="mini-game-feedback" role="status" aria-live="polite"></p><p class="tiny">${escapeHtml(game.note||'')}</p>`;
+    const answers=$$('#game .mini-answer');
+    answers.forEach(answer=>answer.addEventListener('click',()=>{
+      answers.forEach(item=>item.classList.toggle('selected',item===answer));
+      const feedback=$('#gameFeedback');
+      if(game.answer)feedback.textContent=answer.textContent===game.answer?'Nice play — that clears this round.':'Plot twist. Try another move or keep your wonderfully chaotic answer.';
+      else feedback.textContent='Choice locked in. Tiny challenge complete.';
       setMirrorStage(3);
-      say('Mirror · the reflection is complete enough to begin exploring');
+      say('Mirror · playful moment complete, with no DNA created');
     }));
   }catch(error){handleError(error,'Mirror could not find a question')}
 }
@@ -185,16 +193,17 @@ $('#consent').addEventListener('click',async()=>{
   $('#dnaRoomVisual').classList.add('is-consented');
   $('#consent').setAttribute('aria-pressed','true');
   $('#consent').textContent='Consent active · the room is yours';
-  $('#dnaStrengthLabel').textContent='The room is open. Only the clues you place here can shape the helix.';
+  $('#dnaStrengthLabel').textContent='The room is open. Every accepted clue will add a fragment before any pattern appears.';
   $('#dnaRoomVisual').setAttribute('aria-label','An open virtual room with a faint helix waiting for consented clues');
-  say('Human DNA · you chose to explore');
+  say('Happiness DNA · you chose to explore');
+  await refreshDNA();
   $('#room').focus();
 });
 
 $$('.submitExp').forEach(button=>button.addEventListener('click',async()=>{
   if(!needUser())return;
   const type=button.dataset.exp;
-  const input=type==='empty_room'?$('#room'):$('#future');
+  const input={empty_room:$('#room'),future_me:$('#future'),reflection:$('#reflection')}[type];
   const reflection=input.value.trim();
   if(!reflection){
     say('Place a reflection in the room first.','attention');
@@ -203,49 +212,100 @@ $$('.submitExp').forEach(button=>button.addEventListener('click',async()=>{
   }
   await runButtonAction(button,'Reading this clue…',async()=>{
     const result=await api(`/api/v1/dna/${userId}/experiences`,{method:'POST',body:JSON.stringify({experience_type:type,input_mode:'text',response:{reflection},consent_for_analysis:true})});
-    await refreshDNA();
-    say(result.evidence_created?`Human DNA · ${result.evidence_created} traceable clue(s) added`:'Human DNA · no reliable clue extracted yet');
+    await refreshDNA({animateFragments:result.evidence_created>0});
+    say(result.evidence_created?'Happiness DNA · + 1 clue discovered':'Happiness DNA · no reliable clue extracted yet');
   });
 }));
 
 $('#refreshDNA').addEventListener('click',()=>refreshDNA().catch(error=>handleError(error,'The DNA room could not refresh')));
 
-function syncDnaRoom(strands,patterns){
+function acceptedClueExperiences(evidenceItems=[]){
+  const experiences=new Map();
+  evidenceItems.forEach(item=>{
+    if(item.experience_id&&!experiences.has(item.experience_id))experiences.set(item.experience_id,item);
+  });
+  return [...experiences.values()];
+}
+
+function syncDnaFragments(evidenceItems=[],{animateNewest=false}={}){
+  const experiences=acceptedClueExperiences(evidenceItems);
+  const nextCount=experiences.length;
+  const previousCount=dnaFragmentCount;
+  const previousSegments=Math.min(12,previousCount*4);
+  const visibleSegments=Math.min(12,nextCount*4);
+
+  $$('#dnaHelix i').forEach((fragment,index)=>{
+    fragment.classList.toggle('fragment-visible',index<visibleSegments);
+    fragment.classList.toggle('fragment-new',animateNewest&&index>=previousSegments&&index<visibleSegments);
+  });
+  $('#dnaFragmentLedger').innerHTML=experiences.map((item,index)=>`<span class="${animateNewest&&index>=previousCount?'fragment-new':''}" title="Clue ${index+1}: ${escapeHtml(item.experience_type||'reflection')}"></span>`).join('');
+  $('#dnaFragmentStatus').textContent=nextCount===0
+    ? 'HAPPINESS DNA · NO CLUES YET'
+    : nextCount===1
+      ? 'HAPPINESS DNA · + 1 CLUE DISCOVERED · 4 FRAGMENTS'
+      : nextCount===2
+        ? 'HAPPINESS DNA · + ANOTHER CLUE · 8 FRAGMENTS'
+        : `HAPPINESS DNA · 12 FRAGMENTS · ${nextCount} CLUES CONNECTED`;
+  $('#dnaRoomVisual').dataset.clueCount=String(nextCount);
+  $('#dnaRoomVisual').dataset.visibleFragments=String(visibleSegments);
+  dnaFragmentCount=nextCount;
+  return {clueCount:nextCount,grew:nextCount>previousCount};
+}
+
+function syncDnaRoom(strands,patterns,clueCount){
   const room=$('#dnaRoomVisual');
   room.classList.remove('strength-emerging','strength-repeated','is-questioned','is-human');
-  if(!strands.length){
-    $('#dnaStrengthLabel').textContent=room.classList.contains('is-consented')?'The room is open. More than one independent clue is needed.':'The room is quiet. Nothing has been inferred.';
-    room.setAttribute('aria-label','An empty virtual room with a faint, incomplete helix');
-    return;
-  }
   const hasHuman=strands.some(strand=>strand.status==='user_defined');
   const hasQuestioned=strands.some(strand=>strand.status==='questioned')||patterns.some(pattern=>pattern.status==='questioned');
   const hasRepeated=patterns.some(pattern=>pattern.status==='repeated');
-  room.classList.add(hasRepeated?'strength-repeated':'strength-emerging');
+  if(hasRepeated)room.classList.add('strength-repeated');
+  else if(clueCount)room.classList.add('strength-emerging');
   room.classList.toggle('is-questioned',hasQuestioned);
   room.classList.toggle('is-human',hasHuman);
+
+  if(!strands.length){
+    $('#dnaStrengthLabel').textContent=clueCount
+      ? `${clueCount} accepted clue${clueCount===1?' is':'s are'} forming the helix. No pattern has been inferred.`
+      : room.classList.contains('is-consented')?'The room is open. Your first clue can begin the helix.':'The room is quiet. Nothing has been inferred.';
+    $('#dnaInferenceMessage').textContent=clueCount===0?'Not enough independent clues yet.':clueCount===1?'+ 1 clue discovered.':`${clueCount} clue fragments are forming.`;
+    $('#dnaInferenceDetail').textContent=clueCount<3
+      ? `${3-clueCount} more independent clue${3-clueCount===1?' is':'s are'} needed before a repeated pattern is even possible.`
+      : 'The clues have not met every repetition rule yet. “I don’t know yet” is better than invented certainty.';
+    room.setAttribute('aria-label',`A virtual room with ${clueCount} visible Happiness DNA clue fragments and no inferred pattern`);
+    return;
+  }
   const state=hasHuman?'solid in language you defined':hasQuestioned?'destabilized by counter-evidence':hasRepeated?'brightening through repeated evidence':'forming from independent clues';
   $('#dnaStrengthLabel').textContent=`The helix is ${state}.`;
-  room.setAttribute('aria-label',`A virtual room with a helix ${state}`);
+  $('#dnaInferenceMessage').textContent='Something may be repeating.';
+  $('#dnaInferenceDetail').textContent='Only now—after the evidence threshold—can the AI offer a contestable hypothesis.';
+  room.setAttribute('aria-label',`A virtual room with ${clueCount} visible Happiness DNA clue fragments and a helix ${state}`);
 }
 
-async function refreshDNA(){
+async function refreshDNA({animateFragments=false}={}){
   if(!userId)return;
-  const [strands,patterns]=await Promise.all([
+  const [strands,patterns,inferenceMap]=await Promise.all([
     api(`/api/v1/dna/${userId}/strands`),
     api(`/api/v1/dna/${userId}/patterns`),
+    api(`/api/v1/vault/${userId}/inference-map`),
   ]);
-  const visible=strands.filter(strand=>strand.status!=='retired');
-  syncDnaRoom(visible,patterns);
-  $('#revealEmpty').classList.toggle('hidden',visible.length>0);
-  $('#patterns').innerHTML=visible.map(strand=>{
+  const fragmentState=syncDnaFragments(inferenceMap.self_discovery||[],{animateNewest:animateFragments});
+  const patternsById=new Map(patterns.map(pattern=>[pattern.id,pattern]));
+  const surfaced=strands.filter(strand=>{
+    if(strand.status==='retired')return false;
+    const patternStatus=patternsById.get(strand.pattern_id)?.status;
+    return strand.status==='user_defined'||patternStatus==='repeated'||patternStatus==='questioned';
+  });
+  syncDnaRoom(surfaced,patterns,fragmentState.clueCount);
+  if(animateFragments&&fragmentState.grew&&!reduceMotion)await new Promise(resolve=>window.setTimeout(resolve,650));
+  $('#revealEmpty').classList.toggle('hidden',surfaced.length>0);
+  $('#patterns').innerHTML=surfaced.map(strand=>{
     const label=strand.user_label||strand.ai_label||'Unnamed clue';
-    const ownership=strand.status==='user_defined'?'Defined by you':strand.status==='questioned'?'AI hypothesis · challenged':'AI hypothesis';
+    const ownership=strand.status==='user_defined'?'Defined by you':strand.status==='questioned'?'AI hypothesis · tested against counter-evidence':'AI hypothesis · threshold reached';
     return `<button type="button" class="dna-chip ${strand.status==='user_defined'?'human':'ai'}" data-pattern="${escapeHtml(strand.pattern_id||'')}" data-strand="${escapeHtml(strand.id)}" data-label="${escapeHtml(label)}"><span aria-hidden="true">${strand.status==='user_defined'?'●':'◌'}</span><b>${escapeHtml(label)}</b><small>${ownership}</small></button>`;
   }).join('');
   $$('.dna-chip').forEach(chip=>chip.addEventListener('click',()=>openReveal(chip.dataset.pattern,chip.dataset.strand,chip.dataset.label)));
   if(currentStrand){
-    const updated=visible.find(strand=>strand.id===currentStrand);
+    const updated=surfaced.find(strand=>strand.id===currentStrand);
     if(updated)await openReveal(updated.pattern_id,updated.id,updated.user_label||updated.ai_label,false);
   }
 }
@@ -266,7 +326,7 @@ async function openReveal(patternId,strandId,label,scroll=true){
   $('#revealPanel').classList.toggle('human-defined',human);
   $('#revealLabel').textContent=label||pattern?.label||'Possible pattern';
   $('#revealStatus').textContent=(pattern?.status||'emerging').replaceAll('_',' ');
-  $('#ownershipLine').textContent=human?'Defined by you. The original AI hypothesis remains traceable, but your words have authority.':'AI noticed this. It may be wrong. You decide what it means.';
+  $('#ownershipLine').textContent=human?'Defined by you. The original AI hypothesis remains traceable, but your words have authority.':'AI reflects. You decide. This hypothesis may be wrong.';
   $('#contestResult').classList.add('hidden');
   $('#contestResult').innerHTML='';
   $('#renameInput').value=human?(strand.user_label||''):'';
@@ -275,7 +335,7 @@ async function openReveal(patternId,strandId,label,scroll=true){
   resetBlindSpot();
   $('#blindSpotPanel').classList.remove('hidden');
   $('#blindQuestion').textContent='A useful reflection may live in the difference between what AI noticed and what you mean.';
-  $('#blindBridge').textContent='Challenge this clue or define it in your own words, then open the blind spot.';
+  $('#blindBridge').textContent='Ask the AI to prove itself wrong or define the clue in your own words, then look again.';
   $('#blindBoundary').textContent='The AI can surface a tension. It cannot decide what that tension means.';
   if(scroll)$('#revealPanel').scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'start'});
 }
@@ -292,16 +352,17 @@ $('#whyBtn').addEventListener('click',async()=>{
 
 $('#challengeBtn').addEventListener('click',async()=>{
   if(!currentPattern)return;
-  await runButtonAction($('#challengeBtn'),'Looking for contradictions…',async()=>{
+  await runButtonAction($('#challengeBtn'),'Trying to prove this wrong…',async()=>{
     const data=await api(`/api/v1/dna/${userId}/patterns/${currentPattern}/challenge`,{method:'POST'});
+    const resultMarkup=`<div class="contest-heading"><strong>The AI tried to prove itself wrong.</strong><span>${data.status.replaceAll('_',' ')}</span></div>${data.contradicting.length?data.contradicting.map(item=>`<div class="evidence-line counter"><span aria-hidden="true">↔</span><div><b>${escapeHtml(item.summary)}</b><p>${escapeHtml(item.original||'')}</p><small>semantic similarity ${item.similarity}</small></div></div>`).join(''):'<div class="no-counter"><b>No meaningful counter-evidence surfaced yet.</b><p>That does not make the hypothesis true. It only means the current story is incomplete.</p></div>'}<p class="trust-note">${escapeHtml(data.message||'')}</p>`;
+    await refreshDNA();
     const box=$('#contestResult');
     box.classList.remove('hidden');
-    box.innerHTML=`<div class="contest-heading"><strong>The AI tried to prove itself wrong.</strong><span>${data.status.replaceAll('_',' ')}</span></div>${data.contradicting.length?data.contradicting.map(item=>`<div class="evidence-line counter"><span aria-hidden="true">↔</span><div><b>${escapeHtml(item.summary)}</b><p>${escapeHtml(item.original||'')}</p><small>semantic similarity ${item.similarity}</small></div></div>`).join(''):'<div class="no-counter"><b>No meaningful counter-evidence surfaced yet.</b><p>That does not make the hypothesis true. It only means the current story is incomplete.</p></div>'}<p class="trust-note">${escapeHtml(data.message||'')}</p>`;
+    box.innerHTML=resultMarkup;
     $('#revealStatus').textContent=data.status.replaceAll('_',' ');
-    $('#dnaRoomVisual').class.add('is-questioned');
-    await refreshDNA();
+    $('#dnaRoomVisual').classList.add('is-questioned');
     await loadBlindSpot(false);
-    say('Human DNA · the hypothesis has been destabilized');
+    say('Happiness DNA · the AI tried to prove itself wrong');
   });
 });
 
@@ -313,7 +374,7 @@ $('#notMeBtn').addEventListener('click',async()=>{
     const data=await api(`/api/v1/dna/${userId}/patterns/${currentPattern}/not-me`,{method:'POST'});
     $('#contestResult').classList.remove('hidden');
     $('#contestResult').innerHTML=`<div class="rejected-state"><b>Not you. Understood.</b><p>${escapeHtml(data.message)}</p></div>`;
-    say('Human DNA · AI hypothesis rejected');
+    say('Happiness DNA · AI hypothesis rejected');
     compassStrandId=null;
     lastBlindSpot=null;
     currentPattern=null;
@@ -333,12 +394,12 @@ $('#renameBtn').addEventListener('click',async()=>{
   await runButtonAction($('#renameBtn'),'Making your words solid…',async()=>{
     const data=await api(`/api/v1/dna/${userId}/strands/${currentStrand}/rename`,{method:'POST',body:JSON.stringify({user_label:value})});
     $('#revealLabel').textContent=data.user_label;
-    $('#ownershipLine').textContent=`Defined by you. Mirror originally suggested “${data.ai_label||'a different label'}”.`;
+    $('#ownershipLine').textContent=`Defined by you. AI originally suggested “${data.ai_label||'a different label'}”.`;
     $('#revealPanel').classList.add('human-defined');
-    $('#dnaRoomVisual').class.add('is-human');
+    $('#dnaRoomVisual').classList.add('is-human');
     $('#contestResult').classList.remove('hidden');
     $('#contestResult').innerHTML=`<div class="human-win"><span aria-hidden="true">●</span><div><b>${escapeHtml(data.user_label)}</b><p>The AI's label did not become your identity. Your interpretation did.</p></div></div>`;
-    say('Human DNA · defined by you');
+    say('Happiness DNA · defined by you');
     await refreshDNA();
     await loadBlindSpot(false);
   });
@@ -361,7 +422,7 @@ async function loadBlindSpot(scroll=true){
     const owner=data.ownership_state;
     const ownerMarkup=owner==='user_defined'
       ? `<div class="owner-node ai-node"><span>AI NOTICED</span><b>${escapeHtml(data.ai_label)}</b></div><div class="owner-arrow" aria-hidden="true">→</div><div class="owner-node human-node"><span>YOU DEFINED</span><b>${escapeHtml(data.user_label)}</b></div>`
-      : `<div class="owner-node ai-node"><span>${owner==='ai_challenged'?'AI HYPOTHESIS · CHALLENGED':'AI HYPOTHESIS'}</span><b>${escapeHtml(data.ai_label)}</b></div>`;
+      : `<div class="owner-node ai-node"><span>${owner==='ai_challenged'?'AI HYPOTHESIS · TESTED AGAINST COUNTER-EVIDENCE':'AI HYPOTHESIS'}</span><b>${escapeHtml(data.ai_label)}</b></div>`;
     $('#blindOwnership').innerHTML=ownerMarkup;
     $('#blindQuestion').textContent=data.question;
     $('#blindBridge').textContent=data.bridge_text;
@@ -370,8 +431,8 @@ async function loadBlindSpot(scroll=true){
     $('#toCompassBtn').classList.toggle('hidden',!data.can_enter_compass);
     $('#blindSpotPanel').classList.remove('hidden');
     if(scroll)$('#blindSpotPanel').scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'center'});
-    say(data.can_enter_compass?'Blind spot · your words are ready for Compass':'Blind spot · define this in your words before Compass');
-  }catch(error){handleError(error,'The blind spot could not open')}
+    say(data.can_enter_compass?'Look Again · your words are ready for Compass':'Look Again · define this in your words before Compass');
+  }catch(error){handleError(error,'Look Again could not open')}
 }
 
 $('#toCompassBtn').addEventListener('click',()=>{
@@ -381,7 +442,7 @@ $('#toCompassBtn').addEventListener('click',()=>{
   $('#handoffUser').textContent=lastBlindSpot.user_label||'Your words';
   $('#compassHandoff').classList.remove('hidden');
   setView('compass');
-  say('Compass · carrying your interpretation toward the horizon');
+  say('Where Are You Going? · carrying your interpretation toward the horizon');
 });
 
 $('#chapterForm').addEventListener('submit',async event=>{
@@ -410,7 +471,7 @@ $('#reflect').addEventListener('click',async()=>{
       $('#compassQuestion').textContent=result.text;
       $('#compassBoundary').textContent=result.boundary||result.note||'';
       $('#compassReflection').scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'center'});
-      say('Compass · one question, then silence');
+      say('Where Are You Going? · your road, your answer');
     }else{
       $('#compassReflection').classList.add('hidden');
       say('Compass · your words must lead before a question can follow','attention');

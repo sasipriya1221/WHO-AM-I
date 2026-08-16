@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#090a12">
-  <meta name="description" content="WHO AM I? is an evidence-aware, human-defined journey through Mirror, Human DNA, Compass, and Vault.">
-  <title>WHO AM I? · A human-defined journey</title>
+  <meta name="description" content="WHO AM I? is a playful self-reflection journey where every accepted clue gradually forms your Happiness DNA. AI reflects. You decide.">
+  <title>WHO AM I? · Find Your Happiness. Find Your You.</title>
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/static/styles.css?v=cinematic-1">
   <link rel="stylesheet" href="/static/vault.css?v=cinematic-1">
@@ -19,7 +19,7 @@
     <header class="topbar">
       <button class="brand" type="button" data-view="portal" aria-label="Return to the WHO AM I? portal">
         <span class="brand-orbit" aria-hidden="true"><i></i></span>
-        <span><b>WHO AM I?</b><small>Human meaning, held gently</small></span>
+        <span><b>WHO AM I?</b><small>AI reflects. You decide.</small></span>
       </button>
 
       <div class="session-state">
@@ -37,16 +37,16 @@
     <nav id="journeyNav" class="journey-nav" aria-label="Your journey">
       <div class="journey-links">
         <button type="button" data-view="mirror" aria-controls="mirror">
-          <span class="nav-index">01</span><span>Mirror</span><small>be known</small>
+          <span class="nav-index">01</span><span>Mirror</span><small>Meet Yourself</small>
         </button>
         <button type="button" data-view="dna" aria-controls="dna">
-          <span class="nav-index">02</span><span>Human DNA</span><small>notice clues</small>
+          <span class="nav-index">02</span><span>Happiness DNA</span><small>Follow the Clues</small>
         </button>
         <button type="button" data-view="compass" aria-controls="compass">
-          <span class="nav-index">03</span><span>Compass</span><small>face the horizon</small>
+          <span class="nav-index">03</span><span>Compass</span><small>Where Are You Going?</small>
         </button>
         <button type="button" data-view="vault" aria-controls="vault">
-          <span class="nav-index">04</span><span>Vault</span><small>hold memory</small>
+          <span class="nav-index">04</span><span>Vault</span><small>Your Story. Your Control.</small>
         </button>
       </div>
       <a class="judge-entry" href="/demo"><span aria-hidden="true">◆</span> Open judge path</a>
@@ -62,8 +62,9 @@
         <div class="portal-copy">
           <p class="scene-number">A private journey in four spaces</p>
           <h1 id="portalTitle"><span>WHO</span> <span>AM</span> <em>I?</em></h1>
-          <p class="portal-lede">I don't know you yet.</p>
-          <p class="portal-subcopy">That's probably the most honest place to begin.</p>
+          <p class="portal-lede">Find Your Happiness. Find Your You.</p>
+          <p class="portal-subcopy">Every moment leaves a clue. What do yours say about you?</p>
+          <p class="portal-description">A playful self-reflection journey where the little things open the door, every accepted clue adds to a growing Happiness DNA, and meaning always stays yours.</p>
           <div class="portal-actions">
             <button id="enterPortal" class="primary-cta" type="button" data-view="mirror" data-focus="#name">
               Step inside <span aria-hidden="true">→</span>
@@ -87,20 +88,20 @@
         </div>
 
         <div class="portal-chapters" aria-label="Journey chapters">
-          <span><b>Mirror</b> familiar, never interpretive</span>
-          <span><b>Human DNA</b> possible clues, never identity</span>
-          <span><b>Compass</b> one question, never a command</span>
-          <span><b>Vault</b> your memory, under your control</span>
+          <span><b>Mirror</b> Meet Yourself</span>
+          <span><b>Happiness DNA</b> Follow the Clues</span>
+          <span><b>Compass</b> Your road. Your answer.</span>
+          <span><b>Vault</b> Your Story. Your Control.</span>
         </div>
       </section>
 
       <section id="mirror" class="view mirror-world" aria-labelledby="mirrorTitle" tabindex="-1">
         <header class="world-intro">
           <div>
-            <p class="scene-number">01 · THE SURFACE</p>
-            <h2 id="mirrorTitle">A mirror that earns its reflection.</h2>
+            <p class="scene-number">01 · MIRROR · MEET YOURSELF</p>
+            <h2 id="mirrorTitle">Meet Yourself</h2>
           </div>
-          <p>Every detail you choose to share restores another piece. What begins here is familiarity only—never psychological evidence.</p>
+          <p><strong>It starts with the little things.</strong> Every detail you choose to share restores another piece. What begins here is familiarity only—never psychological evidence.</p>
         </header>
 
         <div class="mirror-stage">
@@ -178,22 +179,23 @@
       <section id="dna" class="view dna-world" aria-labelledby="dnaTitle" tabindex="-1">
         <header class="world-intro dna-intro">
           <div>
-            <p class="scene-number">02 · THE INNER ROOM</p>
-            <h2 id="dnaTitle">An empty space. Until your clues arrive.</h2>
+            <p class="scene-number">02 · HAPPINESS DNA · FOLLOW THE CLUES</p>
+            <h2 id="dnaTitle">Follow the Clues</h2>
           </div>
-          <p>Human DNA is a metaphor for patterns you choose to explore. The room may notice repetition; only you can name its meaning.</p>
+          <p><strong>Happiness rarely announces itself. It leaves traces.</strong> Each accepted reflection grows the helix by four visible fragments before the room is allowed to suggest a pattern.</p>
         </header>
 
         <div id="dnaRoomVisual" class="dna-room" role="group" aria-label="An empty virtual room with a faint, incomplete helix">
           <div class="room-ceiling" aria-hidden="true"></div><div class="room-wall left-wall" aria-hidden="true"></div><div class="room-wall right-wall" aria-hidden="true"></div><div class="room-floor" aria-hidden="true"></div>
           <div class="room-grid" aria-hidden="true"></div>
           <div class="helix-field" aria-hidden="true">
-            <div class="helix-core">
+            <div id="dnaHelix" class="helix-core">
               <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
             </div>
+            <div id="dnaFragmentLedger" class="dna-fragment-ledger"></div>
           </div>
           <div class="room-threshold-copy">
-            <span>HUMAN DNA · CONSENTED SPACE</span>
+            <span id="dnaFragmentStatus" role="status" aria-live="polite">HAPPINESS DNA · NO CLUES YET</span>
             <p id="dnaStrengthLabel">The room is quiet. Nothing has been inferred.</p>
           </div>
           <button id="consent" class="room-consent" type="button">I choose to explore <span aria-hidden="true">→</span></button>
@@ -201,12 +203,12 @@
 
         <div class="dna-disclaimer" role="note">
           <strong>AI hypotheses are dotted. Your definitions are solid.</strong>
-          <span>The system can be wrong. Ask why, challenge it, reject it, or rename it.</span>
+          <span>AI reflects. You decide. Ask why, ask it to prove itself wrong, reject it, or rename it.</span>
         </div>
 
         <fieldset id="dnaExperienceFieldset" class="experience-console" disabled>
           <legend class="sr-only">Share self-discovery experiences</legend>
-          <div class="console-intro"><span>PLACE TWO CLUES IN THE ROOM</span><p>Independent experiences are kept separate. Repetition must be earned.</p></div>
+          <div class="console-intro"><span>PLACE CLUES IN THE ROOM</span><p>Each accepted experience adds a fragment first. A repeated pattern still requires three independent clues across at least two experience types.</p></div>
           <div class="experience-prompts">
             <div class="experience-prompt">
               <label for="room"><span><b>Empty Room</b><small>If expectations disappeared, what would still matter?</small></span></label>
@@ -218,19 +220,24 @@
               <textarea id="future" placeholder="I don't want to feel trapped doing something I never chose…"></textarea>
               <button data-exp="future_me" class="submitExp" type="button">Place this clue</button>
             </div>
+            <div class="experience-prompt">
+              <label for="reflection"><span><b>A Small Moment</b><small>When did you recently feel most like yourself?</small></span></label>
+              <textarea id="reflection" placeholder="I felt most like myself when I chose my own direction…"></textarea>
+              <button data-exp="reflection" class="submitExp" type="button">Place this clue</button>
+            </div>
           </div>
         </fieldset>
 
         <section class="strand-observatory" aria-labelledby="strandTitle">
           <div class="observatory-heading">
-            <div><p class="scene-number">YOUR EVOLVING HELIX</p><h3 id="strandTitle">Different experiences. Similar clues.</h3></div>
+            <div><p class="scene-number">YOUR GROWING HAPPINESS DNA</p><h3 id="strandTitle">Clues form first. Patterns wait.</h3></div>
             <button id="refreshDNA" class="quiet-button" type="button">Refresh the room</button>
           </div>
           <div id="patterns" class="patterns" aria-live="polite"></div>
           <div id="revealEmpty" class="empty-reveal">
             <span class="empty-orbit" aria-hidden="true"></span>
-            <p>Not enough independent clues yet.</p>
-            <small>That is a valid result. “I don't know yet” is better than invented certainty.</small>
+            <p id="dnaInferenceMessage">Not enough independent clues yet.</p>
+            <small id="dnaInferenceDetail">That is a valid result. “I don't know yet” is better than invented certainty.</small>
           </div>
         </section>
 
@@ -239,11 +246,11 @@
           <div class="strand-orbit" aria-hidden="true"><div class="strand-glow"></div><div class="mini-helix"><i></i><i></i><i></i><i></i><i></i></div></div>
           <p class="reveal-copy">Different experiences left a similar clue.</p>
           <h2 id="revealLabel">Autonomy</h2>
-          <p id="ownershipLine" class="ownership-line">AI noticed this. You decide what it means.</p>
+          <p id="ownershipLine" class="ownership-line">AI reflects. You decide.</p>
 
           <div class="contest-actions" aria-label="Respond to this AI hypothesis">
             <button id="whyBtn" type="button">Show me why</button>
-            <button id="challengeBtn" class="secondary" type="button">Challenge it</button>
+            <button id="challengeBtn" class="secondary" type="button">Prove yourself wrong</button>
             <button id="notMeBtn" class="danger-outline" type="button">This is not me</button>
           </div>
           <div id="contestResult" class="contest-result hidden" aria-live="polite"></div>
@@ -254,12 +261,12 @@
           </div>
 
           <div id="blindSpotPanel" class="blind-spot hidden" aria-live="polite">
-            <div class="blind-spot-kicker">THE GAP BETWEEN LABEL AND MEANING</div>
-            <h3>The interesting part may be the difference.</h3>
+            <div class="blind-spot-kicker">LOOK AGAIN · THE GAP BETWEEN LABEL AND MEANING</div>
+            <h3>Look Again</h3>
             <div id="blindOwnership" class="ownership-trail"></div>
             <blockquote id="blindQuestion"></blockquote>
             <p id="blindBridge" class="blind-bridge"></p>
-            <div class="blind-actions"><button id="openBlindSpotBtn" class="secondary" type="button">Open the blind spot</button><button id="toCompassBtn" class="hidden" type="button">Carry my words to Compass <span aria-hidden="true">→</span></button></div>
+            <div class="blind-actions"><button id="openBlindSpotBtn" class="secondary" type="button">Look Again</button><button id="toCompassBtn" class="hidden" type="button">Carry my words to Compass <span aria-hidden="true">→</span></button></div>
             <p id="blindBoundary" class="trust-note"></p>
           </div>
         </section>
@@ -268,8 +275,8 @@
       <section id="compass" class="view compass-world" aria-labelledby="compassTitle" tabindex="-1">
         <div class="compass-sky" aria-hidden="true"><span class="sun"></span><span class="mountain mountain-one"></span><span class="mountain mountain-two"></span><span class="horizon-line"></span><span class="road"><i></i></span></div>
         <header class="world-intro compass-intro">
-          <div><p class="scene-number">03 · THE HORIZON</p><h2 id="compassTitle">See the road. Keep the steering wheel.</h2></div>
-          <p>Compass carries only language you have defined. It offers one question, then returns the silence to you.</p>
+          <div><p class="scene-number">03 · COMPASS</p><h2 id="compassTitle">Where Are You Going?</h2></div>
+          <p><strong>Your road. Your answer.</strong> Compass carries only language you have defined. It offers one question, then returns the silence to you.</p>
         </header>
 
         <div id="compassHandoff" class="handoff-card hidden" aria-live="polite">
@@ -293,7 +300,7 @@
           <section class="compass-pause" aria-labelledby="compassPauseTitle">
             <p class="scene-number">COMPASS DOES NOT DECIDE</p>
             <h3 id="compassPauseTitle">One question. Then silence.</h3>
-            <div id="compassResult" class="compass-result" aria-live="polite">Define a Human DNA strand in your own words first.</div>
+            <div id="compassResult" class="compass-result" aria-live="polite">Define a Happiness DNA strand in your own words first.</div>
             <button id="reflect" type="button">Look toward the horizon</button>
           </section>
         </div>
@@ -307,8 +314,8 @@
 
       <section id="vault" class="view vault-world" aria-labelledby="vaultTitle" tabindex="-1">
         <header class="world-intro vault-intro">
-          <div><p class="scene-number">04 · THE PRIVATE MEMORY</p><h2 id="vaultTitle">Nothing hidden. Nothing held hostage.</h2></div>
-          <p>See what is remembered, why it is allowed, and which conclusions it influences. Remove a clue and its influence disappears.</p>
+          <div><p class="scene-number">04 · VAULT</p><h2 id="vaultTitle">Your Story. Your Control.</h2></div>
+          <p>See what is remembered, why it is allowed, and which conclusions it influences. If this clue leaves your story, it leaves my understanding too.</p>
         </header>
 
         <div class="vault-chamber">
@@ -338,7 +345,7 @@
         </div>
 
         <ol class="demo-timeline" aria-label="Judge demo progress">
-          <li class="demo-dot active"><span>01</span>Experience</li><li class="demo-dot"><span>02</span>Human DNA</li><li class="demo-dot"><span>03</span>Challenge</li><li class="demo-dot"><span>04</span>Human Rename</li><li class="demo-dot"><span>05</span>Compass</li><li class="demo-dot"><span>06</span>Delete</li><li class="demo-dot"><span>07</span>DNA Weakens</li>
+          <li class="demo-dot active"><span>01</span>Experience</li><li class="demo-dot"><span>02</span>Happiness DNA</li><li class="demo-dot"><span>03</span>Prove It Wrong</li><li class="demo-dot"><span>04</span>Look Again</li><li class="demo-dot"><span>05</span>Compass</li><li class="demo-dot"><span>06</span>Vault</li><li class="demo-dot"><span>07</span>DNA Weakens</li>
         </ol>
 
         <div id="demoScene" class="demo-stage" data-scene="experience" aria-live="polite">
@@ -347,22 +354,22 @@
           <article class="demo-card visible" aria-labelledby="demoStep1">
             <span class="demo-step-kicker">STEP 1 · EXPERIENCE</span>
             <h3 id="demoStep1">Meet <span id="demoMaya">Maya</span>.</h3>
-            <p>Three separate, consented experiences leave related clues. Entertainment remains outside the inference.</p>
+            <p>Three separate, consented experiences grow the same helix from 4 to 8 to 12 visible fragments before any pattern appears. Entertainment remains outside the inference.</p>
             <div id="demoExperiences" class="demo-experiences"><div class="demo-exp"><span>START</span><b>Seed the demo first</b></div></div>
             <div id="demoEntertainment" class="tiny"></div>
-            <button id="demoRevealBtn" type="button">Reveal the Human DNA clue <span aria-hidden="true">→</span></button>
+            <button id="demoRevealBtn" type="button">Connect the Happiness DNA fragments <span aria-hidden="true">→</span></button>
           </article>
 
           <article class="demo-card" aria-labelledby="demoStep2">
-            <span class="demo-step-kicker">STEP 2 · HAPPINESS DNA</span>
-            <h3 id="demoStep2">Different experiences. Similar clue.</h3>
+            <span class="demo-step-kicker">STEP 2 · FOLLOW THE CLUES</span>
+            <h3 id="demoStep2">Something may be repeating.</h3>
             <div id="demoDnaOwnership"></div><div id="demoDnaState" class="status-chip"></div><div id="demoWhyEvidence"></div>
             <p class="trust-note">The label is still an AI hypothesis, not Maya's identity.</p>
-            <button id="demoChallengeBtn" type="button">Challenge the AI <span aria-hidden="true">→</span></button>
+            <button id="demoChallengeBtn" type="button">Prove yourself wrong <span aria-hidden="true">→</span></button>
           </article>
 
           <article class="demo-card" aria-labelledby="demoStep3">
-            <span class="demo-step-kicker">STEP 3 · CHALLENGE</span>
+            <span class="demo-step-kicker">STEP 3 · PROVE YOURSELF WRONG</span>
             <h3 id="demoStep3">The AI tries to prove itself wrong.</h3>
             <p>Counter-evidence is retrieved before the label is allowed to feel authoritative.</p>
             <div id="demoCounters"></div><p>Pattern state: <b id="demoChallengeState">questioned</b></p>
@@ -370,23 +377,23 @@
           </article>
 
           <article class="demo-card" aria-labelledby="demoStep4">
-            <span class="demo-step-kicker">STEP 4 · HUMAN RENAME</span>
-            <h3 id="demoStep4">The AI's words do not become Maya's identity.</h3>
+            <span class="demo-step-kicker">STEP 4 · LOOK AGAIN · HUMAN RENAME</span>
+            <h3 id="demoStep4">Look Again. The AI's words do not become Maya's identity.</h3>
             <div id="demoRenameOwnership"></div><p id="demoRenameMessage"></p>
             <button id="demoCompassBtn" type="button">Carry Maya's words to Compass <span aria-hidden="true">→</span></button>
           </article>
 
           <article class="demo-card" aria-labelledby="demoStep5">
             <span class="demo-step-kicker">STEP 5 · COMPASS</span>
-            <h3 id="demoStep5">See the road. Keep the steering wheel.</h3>
-            <div id="demoCompassOwnership"></div><blockquote id="demoCompassQuestion" class="demo-question"></blockquote><p id="demoCompassBoundary" class="trust-note"></p><p class="tiny">No recommendation follows. Maya decides.</p>
+            <h3 id="demoStep5">Where Are You Going?</h3>
+            <div id="demoCompassOwnership"></div><blockquote id="demoCompassQuestion" class="demo-question"></blockquote><p id="demoCompassBoundary" class="trust-note"></p><p class="tiny">Your road. Your answer. No recommendation follows. Maya decides.</p>
             <button id="demoDeletePreviewBtn" type="button">Inspect one supporting reflection <span aria-hidden="true">→</span></button>
           </article>
 
           <article class="demo-card" aria-labelledby="demoStep6">
-            <span class="demo-step-kicker">STEP 6 · VAULT</span>
+            <span class="demo-step-kicker">STEP 6 · VAULT · YOUR STORY. YOUR CONTROL.</span>
             <h3 id="demoStep6">Deletion is not cosmetic.</h3>
-            <p>The Vault shows exactly which inference a reflection influences before Maya removes it.</p>
+            <p>If this clue leaves your story, it leaves my understanding too.</p>
             <div id="demoDeleteEvidence" class="demo-counter"></div><div id="demoDeleteImpact"></div>
             <button id="demoDeleteBtn" class="danger-outline" type="button">Delete reflection and recalculate DNA <span aria-hidden="true">→</span></button>
           </article>
@@ -396,16 +403,18 @@
             <h3 id="demoStep7">The story changed, so the AI must change too.</h3>
             <div id="demoWeakenOwnership"></div>
             <div class="demo-change"><div class="demo-state"><span>BEFORE</span><strong id="demoBeforeStatus">—</strong><b id="demoBeforeSupport">—</b></div><div class="demo-arrow" aria-hidden="true">→</div><div class="demo-state after"><span>AFTER</span><strong id="demoAfterStatus">—</strong><b id="demoAfterSupport">—</b></div></div>
-            <p id="demoWeakenMessage"></p><p id="demoOwnershipPreserved"><strong>Your definition stayed yours; only the AI evidence state changed.</strong></p>
+            <p id="demoWeakenMessage"></p><p id="demoOwnershipPreserved"><strong>Your meaning was yours. Only my evidence changed.</strong></p>
             <div class="demo-principle"><b>WHO AM I?</b><span>The AI was allowed to be wrong, Maya was allowed to redefine it, and deleted evidence lost its influence.</span></div>
+            <p class="demo-continuation">You're still becoming you. And that's kind of the point.</p>
           </article>
         </div>
       </section>
     </main>
 
     <footer class="site-footer">
-      <span>WHO AM I? · HUMAN MEANING OVER MACHINE CERTAINTY</span>
+      <span>WHO AM I? · FIND YOUR HAPPINESS. FIND YOUR YOU.</span>
       <p>No happiness scores · No diagnoses · No life recommendations</p>
+      <p>AI reflects. You decide.</p>
       <a href="/demo">Judge demo</a>
     </footer>
   </div>
