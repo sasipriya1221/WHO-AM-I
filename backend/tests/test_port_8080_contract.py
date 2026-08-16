@@ -25,7 +25,7 @@ def test_docker_defaults_match_documented_port_8080():
     compose = COMPOSE.read_text(encoding="utf-8")
 
     assert "EXPOSE 8080" in dockerfile
-    assert "--port 8080" in dockerfile
+    assert "--port ${PORT:-8080}" in dockerfile
     assert "8080:8080" in compose
     assert "8000:8000" not in compose
     assert "EXPOSE 8000" not in dockerfile
