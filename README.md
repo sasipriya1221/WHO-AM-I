@@ -2,9 +2,13 @@
 
 <div align="center">
 
-## AI finds the clues. You own the meaning.
+## Find Your Happiness. Find Your You.
 
-**A cinematic, evidence-backed self-discovery experience where AI must explain itself, seek counter-evidence, yield authorship to the human, and lose influence when supporting memory is deleted.**
+### Every moment leaves a clue. What do yours say about you?
+
+**WHO AM I? is a playful self-reflection journey where the little things help you begin, every accepted self-discovery clue visibly adds a fragment to your gradually forming Happiness DNA, and only threshold-qualified repetition can become a pattern hypothesis.**
+
+> **AI reflects. You decide.**
 
 WHO AM I? is not a personality test, happiness score, diagnosis, or decision engine. It treats AI interpretations as contestable hypotheses and keeps the human in authority from the first clue to the final reflection.
 
@@ -24,26 +28,26 @@ The images below are captures from the deployed redesigned application and its j
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/screenshots/human-dna.png" alt="Human DNA scene showing a repeated AI hypothesis and its three supporting reflections"></td>
+    <td width="50%"><img src="docs/screenshots/human-dna.png" alt="Happiness DNA scene showing a repeated AI hypothesis and its three supporting reflections"></td>
     <td width="50%"><img src="docs/screenshots/compass.png" alt="Compass scene carrying the human-defined language into a reflective question"></td>
   </tr>
   <tr>
-    <td align="center"><strong>Human DNA</strong><br>Different experiences form an explainable, still-contestable clue.</td>
+    <td align="center"><strong>Happiness DNA</strong><br>Each accepted clue forms a fragment before repetition becomes an explainable, still-contestable hypothesis.</td>
     <td align="center"><strong>Compass</strong><br>The user's wording crosses the boundary; an AI label does not.</td>
   </tr>
 </table>
 
 ![Vault scene showing the reflection-to-inference link before deletion](docs/screenshots/vault-impact.png)
 
-## Mirror → Human DNA → Challenge / Human Rename → Compass → Vault
+## Meet Yourself → Follow the Clues → Prove yourself wrong → Look Again → Where Are You Going? → Your Story. Your Control.
 
 | Space | What happens | Boundary that matters |
 |---|---|---|
-| **Mirror** | Low-pressure, interest-aware play makes the space feel familiar and progressively completes the reflection puzzle. | Mirror records are stored for `entertainment` with `dna_allowed=false`; they cannot create Human DNA evidence. |
-| **Human DNA** | With explicit analysis consent, separate reflections become provenance-carrying support, contradiction, or contextual evidence. Repeated clues can become pattern hypotheses. | A single reflection cannot become a repeated pattern, and every AI label remains a hypothesis. |
-| **Challenge / Human Rename** | **Why** exposes the source reflections. **Challenge** retrieves both supporting and counter-evidence. The person can reject the pattern or replace the AI label with their own words. | A rejected pattern is retired. A renamed strand becomes `user_defined`; human authorship outranks automatic recomputation. |
-| **Compass** | The person brings a current life chapter to a cinematic road-and-horizon reflection. Compass asks one tension-revealing question using the person's wording. | Compass refuses unconfirmed AI hypotheses and never recommends a major decision. |
-| **Vault** | Entertainment memory, self-discovery evidence, and DNA state remain inspectable. The user can preview exactly what a reflection affects before deleting it. | Deletion removes the evidence and graph links, recomputes the pattern, and preserves the user's own definition while the AI inference weakens. |
+| **Mirror — Meet Yourself**<br>*It starts with the little things.* | Low-pressure, interest-aware play makes the space feel familiar and progressively completes the reflection puzzle. | Mirror records are stored for `entertainment` with `dna_allowed=false`; they cannot create Happiness DNA evidence. |
+| **Happiness DNA — Follow the Clues**<br>*Happiness rarely announces itself. It leaves traces.* | With explicit analysis consent, each accepted experience immediately adds a visible fragment. Only then can separate reflections become provenance-carrying support, contradiction, or contextual evidence. | The interface withholds AI pattern labels until the backend's repeated-pattern threshold is met. A single reflection can never become a repeated pattern. |
+| **Prove yourself wrong / Look Again** | **Why** exposes source reflections. **Prove yourself wrong** calls the unchanged `/challenge` behavior to retrieve supporting and counter-evidence. The person can reject the pattern or replace the AI label with their own words. | A rejected pattern is retired. A renamed strand becomes `user_defined`; human authorship outranks automatic recomputation. |
+| **Compass — Where Are You Going?**<br>*Your road. Your answer.* | The person brings a current life chapter to a cinematic road-and-horizon reflection. Compass asks one tension-revealing question using the person's wording. | Compass refuses unconfirmed AI hypotheses and never recommends a major decision. |
+| **Vault — Your Story. Your Control.** | Entertainment memory, self-discovery evidence, and DNA state remain inspectable. The user can preview exactly what a reflection affects before deleting it. | “If this clue leaves your story, it leaves my understanding too.” Deletion removes graph links, recomputes the pattern, and preserves the person's meaning while AI evidence weakens. |
 
 ## Architecture: evidence before interpretation
 
@@ -57,7 +61,7 @@ flowchart TD
     E --> EG["Evidence Graph<br/>PatternEvidence edges"]
     EG --> T["Thresholded pattern state<br/>unknown · emerging · questioned · repeated"]
     EG --> R["Semantic retrieval<br/>support + counter-evidence"]
-    T --> W["Why + Challenge"]
+    T --> W["Why + Prove yourself wrong<br/>/challenge endpoint"]
     R --> W
     W --> H["Human authority<br/>reject or rename"]
     H --> S["User-defined DNA strand"]
@@ -71,7 +75,7 @@ flowchart TD
     S -.->|human wording remains authoritative| RC
 ```
 
-The implemented repeated-pattern threshold requires at least three supporting evidence items from three distinct experiences across at least two experience types. Contradicting evidence moves an eligible pattern to `questioned`; it is surfaced rather than hidden.
+Every accepted self-discovery experience that produces evidence adds a visible fragment before the interface considers showing an AI label. The implemented repeated-pattern threshold is unchanged: at least three supporting evidence items from three distinct experiences across at least two experience types. Until that gate is met, fragments can grow but no pattern chip is surfaced. Contradicting evidence moves an eligible pattern to `questioned`; it is surfaced rather than hidden.
 
 ## Privacy is a data-flow rule
 
@@ -99,7 +103,7 @@ Purpose and consent are checked **before** a provider receives a reflection. Mir
 
 | Layer | Implemented with | Responsibility |
 |---|---|---|
-| Experience | Semantic HTML, CSS, vanilla JavaScript | Cinematic Portal, Mirror, Human DNA, Compass, Vault, and responsive judge path |
+| Experience | Semantic HTML, CSS, vanilla JavaScript | Cinematic Portal, Mirror, progressive Happiness DNA fragments, Compass, Vault, and responsive judge path |
 | API | Python 3.11+, FastAPI, Pydantic | Journey endpoints, validation, safety and ownership boundaries |
 | Persistence | SQLAlchemy 2, Alembic | Users, purpose-bound experiences, evidence, graph links, patterns, strands, and life chapters |
 | Database | SQLite by default; `DATABASE_URL` override with PostgreSQL driver included | Local zero-config storage or an externally configured database |
@@ -120,7 +124,7 @@ There are two provider modes behind the same evidence and authority controls. Th
 | Intended use | Local development, CI, reproducible evaluation, and credential-free demos | Testing the same product controls with hosted language and embedding models |
 | What remains application-controlled | Purpose and consent gates, evidence types and provenance, pattern thresholds, user rejection/rename authority, Compass boundary, and inference-aware deletion | The same controls; provider output cannot bypass them |
 
-The `/demo` route adds a **fixed judge story** on top of the default local provider. `POST /api/v1/demo/seed` creates a fresh Maya journey with three independent supporting reflections and separate counter-evidence; the UI then exercises the real Why, Challenge, Human Rename, Compass, Vault impact, deletion, and recomputation endpoints.
+The `/demo` route adds a **fixed judge story** on top of the default local provider. `POST /api/v1/demo/seed` creates a fresh Maya journey with three independent supporting reflections and separate counter-evidence; the UI shows each clue as a fragment before it exercises the real Why, `/challenge` (“Prove yourself wrong”), Human Rename, Compass, Vault impact, deletion, and recomputation endpoints.
 
 For an exactly reproducible judge or CI run, leave `WHOAMI_AI_PROVIDER` unset or set it to `local`. Provider configuration is global to the backend, so a deployment switched to `openai_compatible` also uses that provider for semantic retrieval during `/demo`.
 
@@ -225,7 +229,7 @@ Expected `GET /health` response:
 |---|---|
 | Judge path | `POST /api/v1/demo/seed` |
 | Mirror | `POST /api/v1/mirror/{user_id}/interests`, `GET /api/v1/mirror/{user_id}/game` |
-| Human DNA | consent, experience creation, patterns, Why/evidence, Challenge, rejection, strands, Human Rename, and Blind Spot under `/api/v1/dna/{user_id}` |
+| Happiness DNA | consent, experience creation, patterns, Why/evidence, Challenge (`Prove yourself wrong` in the UI), rejection, strands, Human Rename, and Blind Spot (`Look Again` in the UI) under `/api/v1/dna/{user_id}` |
 | Compass | `POST /api/v1/compass/{user_id}/chapters`, `POST /api/v1/compass/{user_id}/reflect` |
 | Vault | inference map, deletion impact preview, and delete-with-recalculation under `/api/v1/vault/{user_id}` |
 | Safety | `POST /api/v1/safety/check` flags high-risk text with `allow_dna_processing=false` |
@@ -247,4 +251,6 @@ backend/tests/            API, product-contract, privacy, and deletion regressio
 
 ## Hackathon proof
 
-The implemented proof is intentionally focused: **Mirror → Human DNA → Challenge / Human Rename → Compass → Vault**. It demonstrates that useful AI reflection does not require machine certainty—the system can expose its evidence, look for reasons it may be wrong, let the person define the meaning, refuse to make the decision, and surrender influence when memory is removed.
+The implemented proof is intentionally focused: **Meet Yourself → Follow the Clues → Prove yourself wrong → Look Again → Where Are You Going? → Your Story. Your Control.** It demonstrates that useful AI reflection does not require machine certainty—the system can expose its evidence, look for reasons it may be wrong, let the person define the meaning, refuse to make the decision, and surrender influence when memory is removed.
+
+**You're still becoming you. And that's kind of the point.**

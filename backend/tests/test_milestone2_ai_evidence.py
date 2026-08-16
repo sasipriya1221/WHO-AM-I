@@ -128,6 +128,7 @@ def test_why_challenge_rename_and_not_me_flows():
     assert challenge.status_code == 200
     assert challenge.json()["contradicting"]
     assert challenge.json()["status"] == "questioned"
+    assert "prove it wrong" in challenge.json()["message"].lower()
 
     strands = client.get(f"/api/v1/dna/{uid}/strands").json()
     strand = next(s for s in strands if s["pattern_id"] == pid)
