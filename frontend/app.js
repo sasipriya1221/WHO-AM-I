@@ -152,22 +152,29 @@ $('#interestForm').addEventListener('submit',async event=>{
     return;
   }
   await runButtonAction($('#saveInterest'),'Remembering…',async()=>{
-    await api(`/api/v1/mirror/${userId}/interests`,{method:'POST',body:JSON.stringify({category:$('#interestType').value,name:interest})});
+    const savedInterest=await api(`/api/v1/mirror/${userId}/interests`,{method:'POST',body:JSON.stringify({category:$('#interestType').value,name:interest})});
     setMirrorStage(2);
     say('Mirror remembers this for play—not for Human DNA');
-    await loadGame();
+    await loadGame(savedInterest.id);
   });
 });
 
-async function loadGame(){
+async function loadGame(interestId=null){
   if(!needUser())return;
   try{
-    const game=await api(`/api/v1/mirror/${userId}/game`);
-    $('#game').innerHTML=`<b>${escapeHtml(game.title)}</b><p>${escapeHtml(game.question)}</p>${(game.options||[]).map(option=>`<button type="button" class="mini-answer">${escapeHtml(option)}</button>`).join('')}<p class="tiny">${escapeHtml(game.note||'')}</p>`;
-    $$('.mini-answer').forEach(answer=>answer.addEventListener('click',()=>{
-      $$('.mini-answer').forEach(item=>item.classList.toggle('selected',item===answer));
+    const suffix=interestId?`?interest_id=${encodeURIComponent(interestId)}`:'';
+    const game=await api(`/api/v1/mirror/${userId}/game${suffix}`);
+    const entertainmentOnly=game.purpose==='entertainment'&&game.dna_allowed===false;
+    if(!entertainmentOnly)throw new Error('Mirror refused a response without the entertainment-only boundary');
+    $('#game').innerHTML=`<div class="mini-game-meta"><span>${escapeHtml((game.interaction||'play').replaceAll('_',' '))}</span><span>Entertainment only</span></div><b>${escapeHtml(game.title)}</b><p>${escapeHtml(game.question)}</p><div class="mini-answer-grid">${(game.options||[]).map(option=>`<button type="button" class="mini-answer">${escapeHtml(option)}</button>`).join('')}</div><p id="gameFeedback" class="mini-game-feedback" role="status" aria-live="polite"></p><p class="tiny">${escapeHtml(game.note||'')}</p>`;
+    const answers=$$('#game .mini-answer');
+    answers.forEach(answer=>answer.addEventListener('click',()=>{
+      answers.forEach(item=>item.classList.toggle('selected',item===answer));
+      const feedback=$('#gameFeedback');
+      if(game.answer)feedback.textContent=answer.textContent===game.answer?'Nice play — that clears this round.':'Plot twist. Try another move or keep your wonderfully chaotic answer.';
+      else feedback.textContent='Choice locked in. Tiny challenge complete.';
       setMirrorStage(3);
-      say('Mirror · the reflection is complete enough to begin exploring');
+      say('Mirror · playful moment complete, with no DNA created');
     }));
   }catch(error){handleError(error,'Mirror could not find a question')}
 }

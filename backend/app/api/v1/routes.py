@@ -8,6 +8,7 @@ from app.models.entities import *
 from app.schemas.common import *
 from app.services.dna.engine import extract_evidence, recompute_patterns
 from app.services.evidence.semantic import support_and_counter_evidence
+from app.services.mirror.playful import build_playful_activity
 from app.services.safety import assess_dna_text
 
 router = APIRouter(prefix="/api/v1")
@@ -69,17 +70,35 @@ def add_interest(user_id: str, payload: InterestCreate, db: Session = Depends(ge
 
 
 @router.get("/mirror/{user_id}/game")
-def get_game(user_id: str, db: Session = Depends(get_db)):
-    interests = db.scalars(select(MirrorInterest).where(MirrorInterest.user_id == user_id)).all()
-    if not interests:
-        return {"title": "Quick hello", "question": "Tell Mirror one series, game, or sport you enjoy.", "options": []}
-    name = interests[0].name
-    lower = name.lower()
-    if "throne" in lower:
-        return {"title": "Your GOT challenge", "question": "What are the words of House Stark?", "options": ["Winter is Coming", "Fire and Blood", "Hear Me Roar"], "answer": "Winter is Coming", "note": "Entertainment only — never DNA evidence."}
-    if "angry" in lower:
-        return {"title": "Angry Birds-inspired puzzle", "question": "A target is behind a tall wall. Which launch is most likely to clear it?", "options": ["Low angle", "Medium angle", "High arc"], "answer": "High arc", "note": "Entertainment only — never DNA evidence."}
-    return {"title": f"A little {name} moment", "question": f"What do you enjoy most about {name}?", "options": ["The challenge", "The story", "The people", "Just fun"], "note": "Entertainment only — never DNA evidence."}
+def get_game(
+    user_id: str,
+    interest_id: str | None = None,
+    db: Session = Depends(get_db),
+):
+    user_or_404(db, user_id)
+    query = select(MirrorInterest).where(MirrorInterest.user_id == user_id)
+    if interest_id:
+        query = query.where(MirrorInterest.id == interest_id)
+    else:
+        query = query.order_by(
+            MirrorInterest.updated_at.desc(),
+            MirrorInterest.created_at.desc(),
+        )
+    interest = db.scalar(query)
+    if interest_id and not interest:
+        raise HTTPException(404, "Mirror interest not found")
+    if not interest:
+        return {
+            "interest_id": None,
+            "title": "Quick hello",
+            "question": "Tell Mirror one series, game, sport, or hobby you enjoy.",
+            "options": [],
+            "interaction": "prompt",
+            "purpose": DataPurpose.ENTERTAINMENT.value,
+            "dna_allowed": False,
+            "note": "Entertainment only — no psychological interpretation and never Happiness DNA evidence.",
+        }
+    return build_playful_activity(interest)
 
 
 @router.post("/dna/{user_id}/consent")
