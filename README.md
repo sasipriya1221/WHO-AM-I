@@ -1,3 +1,7 @@
+<a href="https://github.com/sasipriya1221"><img src=".github/episode.svg" width="100%" alt="Episode 05, WHO-AM-I. The threat: profiling by inference. The defence: AI suggests, you decide."></a>
+
+<p align="center"><a href="https://github.com/sasipriya1221">◀ Back to the teaser</a> &nbsp;·&nbsp; <b>Episode 05 of 07</b> &nbsp;·&nbsp; <a href="https://sasipriya-kalimuthu.vercel.app">Watch the trailer ▶</a></p>
+
 # WHO AM I?
 
 <div align="center">
@@ -257,3 +261,7 @@ backend/tests/            API, product-contract, privacy, and deletion regressio
 The implemented proof is intentionally focused: **Meet Yourself → Follow the Clues → Prove yourself wrong → Look Again → Where Are You Going? → Your Story. Your Control.** It demonstrates that useful AI reflection does not require machine certainty—the system can expose its evidence, look for reasons it may be wrong, let the person define the meaning, refuse to make the decision, and surrender influence when memory is removed.
 
 **You're still becoming you. And that's kind of the point.**
+
+## License
+
+MIT. See [LICENSE](LICENSE).
