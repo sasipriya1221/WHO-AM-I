@@ -1,6 +1,6 @@
 <a href="https://github.com/sasipriya1221"><img src=".github/episode.svg" width="100%" alt="Episode 05, WHO-AM-I. The threat: profiling by inference. The defence: AI suggests, you decide."></a>
 
-<p align="center"><a href="https://github.com/sasipriya1221">◀ Back to the teaser</a> &nbsp;·&nbsp; <b>Episode 05 of 07</b> &nbsp;·&nbsp; <a href="https://sasipriya-kalimuthu.vercel.app">Watch the trailer ▶</a></p>
+<p align="center"><a href="https://github.com/sasipriya1221">◀ Sasipriya Kalimuthu</a> &nbsp;·&nbsp; <b>Episode 05 of 07</b> &nbsp;·&nbsp; <a href="https://sasipriya-kalimuthu.vercel.app">Portfolio ▶</a></p>
 
 # WHO AM I?
 
